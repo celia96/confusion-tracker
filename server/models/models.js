@@ -1,117 +1,149 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-// if (!process.env.MONGODB_URI) {
-//   /* eslint-disable-next-line no-console */
-//   console.log('Error: MONGODB_URI is not set. Did you run source env.sh ?');
-//   process.exit(1);
-// }
-//
-// mongoose.connect(process.env.MONGODB_URI, {
-//   useNewUrlParser: true,
-//   auth: { authdb: 'admin' }
-// });
+/* 
+Teacher
+- email: String
+- first name: String
+- last name: String
+- password: String
+- Courses: [courseSchema]
 
-// studentSchema
-// - nickname or name (String): set by student
-// - confused or not (Boolean by default = false): set by student
-//
-// professorSchema
-// - email (String)
-// - password (String)
-//
-// classSchema
-// - owner of the class (mongoose.Schema.ObjectId): the owner will be the professor
-// - password of classroom (String): set by prof
-// - topics (Array): set by prof
-// - tags (Array of objects = [{tag: time}, {tag: time}, {tag: time}]): set by students
-// - confusion (Array of objects = [{time: confusion-level}, {time: confusion-level}, {time: confusion-level}]) : set by students
-// - students attending (Array): we can iterate through students attending and check whether they are confused or not
-// - Level of confusion level that should give an alert to the professors (Integer by default: 50% of students attending): set by professor
-//
-// commentSchema
-// - comment (set by students)
-// - level of confusion (1 - 5) (set by students)
+Course
+- course name: String
+- Teacher: { type: Schema.ObjectId, ref: 'Teacher' }
+- dateCreated: Date
+- Classes: [classSchema]
 
-const studentSchema = new mongoose.Schema({
-  nickname: {
-    type: String,
+Class
+- course name: 
+- dateCreated: Date
+- Teacher: { type: Schema.ObjectId, ref: 'Teacher' }
+- code: String
+- agendas: Map { agenda1: [list of questions], agenda2: [list of questions] }
+- alert: int
+- duration: int
+- attendees: Map { studentID: confused(bool) }
+- survey: Map { comments: [], ratings: Map { 1: #, 2: #, 3: #, 4: #, 5: # } }
+- isOver: Bool
+- graph: Map { data: [], labels: [] }
+*/
+
+const classSchema = new mongoose.Schema({
+  // course:{
+  //   type: Schema.ObjectId,
+  //   ref: 'Course',
+  //   required: true
+  // },
+  // code: {
+  //   type: String,
+  //   requried: true
+  // },
+  // teacher: {
+  //   type: Schema.ObjectId,
+  //   ref: 'Teacher',
+  //   required: true
+  // },
+  attendees: {
+    type: Map,
     required: true
+  },
+  confusionRate: {
+    type: Number
+    // required: true
+  },
+  questions: {
+    type: Map,
+    requried: false
   }
+  // agendas: {
+  //   type: Map,
+  //   required: true
+  // },
+  // dateCreated: {
+  //   type: String,
+  //   required: true
+  // },
+  // duration: {
+  //   type: Number,
+  //   required: true
+  // },
+  // alert: {
+  //   type: Number,
+  //   required: true
+  // },
+  // confusionGraph: {
+  //   data: {
+  //     type: Array
+  //   },
+  //   lables: {
+  //     type: Array
+  //   }
+  // },
+  // isOver: {
+  //   type: Boolean,
+  //   required: true
+  // },
+  // survey: {
+  //   comments: {
+  //     type: Array
+  //   },
+  //   ratings: {
+  //     type: Map,
+  //     default: {
+  //       1: 0,
+  //       2: 0,
+  //       3: 0,
+  //       4: 0,
+  //       5: 0
+  //     }
+  //   }
+  // },
 });
 
-const professorSchema = new mongoose.Schema({
+const courseSchema = new mongoose.Schema({
+  courseName: {
+    type: String,
+    required: true
+  },
+  teacher: {
+    type: Schema.ObjectId,
+    ref: 'Teacher',
+    required: true
+  },
+  dateCreated: {
+    type: String,
+    required: true
+  },
+  classes: [{ type: Schema.Types.ObjectId, ref: 'Class' }]
+});
+
+const teacherSchema = new mongoose.Schema({
   email: {
+    type: String,
+    required: true
+  },
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
     type: String,
     required: true
   },
   password: {
     type: String,
-    required: false
-  }
+    required: true
+  },
+  courses: [{ type: Schema.Types.ObjectId, ref: 'Course' }]
 });
 
-const classSchema = new mongoose.Schema({
-  students: {
-    type: Map,
-    required: true
-  },
-  roomName: {
-    type: String,
-    required: true
-  },
-  owner: {
-    type: String,
-    required: true
-  },
-  tags: {
-    type: Map,
-    required: true
-  },
-  isOver: {
-    type: Boolean,
-    required: true
-  },
-  duration: {
-    type: Number,
-    required: true
-  },
-  alert: {
-    type: Number,
-    required: true
-  },
-  data: {
-    type: Array,
-    required: true
-  },
-  labels: {
-    type: Array,
-    required: true
-  }
-});
-
-const commentSchema = new mongoose.Schema({
-  confusionlevel: {
-    type: Map,
-    required: true
-  },
-  comments: {
-    type: Array,
-    required: true
-  },
-  roomName: {
-    type: String,
-    required: true
-  }
-});
-
-const Student = mongoose.model('Student', studentSchema);
-const Professor = mongoose.model('Professor', professorSchema);
 const Class = mongoose.model('Class', classSchema);
-const Comment = mongoose.model('Comment', commentSchema);
+const Course = mongoose.model('Course', courseSchema);
+const Teacher = mongoose.model('Teacher', teacherSchema);
 
 module.exports = {
-  Student,
-  Professor,
   Class,
-  Comment
+  Course,
+  Teacher
 };

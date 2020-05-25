@@ -1,5 +1,5 @@
 {
-  "name": "Confusion-Tracking-server",
+  "name": "confusion-tracking-server",
   "version": "0.1.0",
   "private": true,
   "description": "Server for Confusion Tracking Application",
@@ -26,9 +26,9 @@
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-import": "^2.16.0",
-    "jest": "^24.3.1",
+    "jest": "^26.0.1",
     "mongodb-memory-server": "^5.1.0",
-    "nodemon": "^1.18.10",
+    "nodemon": "^2.0.3",
     "supertest": "^4.0.2"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
     "nodemailer": "^6.0.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "socket.io": "^2.3.0"
   }
 }

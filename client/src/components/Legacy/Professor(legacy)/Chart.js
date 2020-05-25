@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import logo from '../../logo.png';
 import { Redirect } from 'react-router-dom';
-import Authn from '../Authn/Authn';
+import Authn from '../../Authn/Authn';
 
 const ButtonBar = styled.div`
   margin: 20px;
