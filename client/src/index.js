@@ -1,8 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+
+import { store, persistentStore } from './redux/store';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'semantic-ui-css/semantic.min.css';
-// import '../semantic-ui-react/dist/umd/semantic.min.js';
 import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <PersistGate persistor={persistentStore}>
+      <App />
+    </PersistGate>
+  </Provider>,
+  document.getElementById('root')
+);

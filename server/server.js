@@ -10,9 +10,9 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
-const { OAuth2Client } = require('google-auth-library');
 
 const app = express();
+
 // Databased (mlab) setup
 if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI, {
@@ -25,7 +25,7 @@ if (process.env.MONGODB_URI) {
 
 const models = require('./models/models');
 
-const { Professor, Class, Comment } = models;
+const { Class, Course, Teacher } = models;
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -35,7 +35,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+let emailConfirmCode;
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -77,401 +77,378 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new LocalStrategy(
     { usernameField: 'email', passwordField: 'password' },
-    (email, password, done) => {
+    function(email, password, done) {
       // Find the user with the given username
-      Professor.findOne({ email })
-        .then(user => {
-          // if no user present, auth failed
-          if (!user) {
-            done(null, { message: 'Incorrect username.' });
-          }
-          // if passwords do not match, auth failed
-          if (user.password !== password) {
-            done(null, { message: 'Incorrect password.' });
-          }
-          // auth has has succeeded
-          done(null, user);
-        })
-        .catch(err => {
-          console.log('ERROR', err);
-          done(err);
-        });
+      User.findOne({ email }, function(err, user) {
+        if (err) {
+          return done(err);
+        }
+        if (!user) {
+          return done(null, false);
+        }
+        if (!user.verifyPassword(password)) {
+          return done(null, false);
+        }
+        return done(null, user);
+      });
     }
   )
 );
 
 passport.use(
-  new BearerStrategy((token, done) => {
-    googleClient
-      .verifyIdToken({
-        idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID
-      })
-      .then(async ticket => {
-        const payload = ticket.getPayload();
-        let user = await Professor.findOne({ googleId: payload.sub });
-        if (!user) {
-          const arr = [{ googleId: payload.sub, email: payload.email }];
-          user = await Professor.insertMany(arr);
-          [user] = user;
-        }
-        done(null, user);
-      })
-      .catch(error => {
-        done(error);
-      });
+  new BearerStrategy(function(token, done) {
+    Professor.findOne({ token: token }, function(err, user) {
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false);
+      }
+      return done(null, user, { scope: 'read' });
+    });
   })
 );
 
-// Professor: Get my information
-app.get('/api/me', (request, response) => {
-  if (request.user) {
-    response.json({
-      success: true,
-      id: request.user.id,
-      professor: request.user.email
-    });
-  } else {
-    response.json({ success: false });
+/*
+As a student and a professor, I would like to have today’s agenda, set by the instructor, displayed in my screen.
+- GET: api/class/:classId
+    - send: class id
+    - receive: all the info about the class
+*/
+// used
+app.get('/api/class/:classId', async (request, response) => {
+  const { classId } = request.params;
+  if (!classId) {
+    return response.sendStatus(400);
+  }
+  try {
+    const classRoom = await Class.findById(classId);
+    // const classRoom = await Class.findOne({ classId });
+    if (!classRoom) return response.sendStatus(400);
+    response.json(classRoom);
+  } catch (err) {
+    response.sendStatus(500);
   }
 });
 
-// Professor: Registration
-app.post('/api/professor/register', (request, response) => {
-  const { email, password } = request.body;
+// Student
+/* 
+As a student, I would like to join the class when the class starts by its room ID and enter the room code and my student ID to join the room
+- POST: api/student/join
+    - send: class code
+    - receive: true or false
+- POST: api/student/login
+    - send: class code, student id
+*/
+app.post('/api/student/join', async (request, response) => {
+  const { classCode } = request.body;
+  if (!classCode) {
+    return response.sendStatus(400);
+  }
+  try {
+    const room = await Class.findOne({ code: classCode });
+    if (!room || room.isOver) {
+      return response.sendStatus(400);
+    }
+    response.json({ class: room });
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
+});
+
+app.post('/api/student/login', async (request, response) => {
+  const { classCode, studentId } = request.body;
+  if (!classCode || !studentId) {
+    return response.sendStatus(400);
+  }
+  try {
+    const room = await Class.findOne({ code: classCode });
+    if (!room || room.attendees.has(studentId)) {
+      return response.sendStatus(400);
+    }
+    room.students.set(studentId, false);
+    const updatedRoom = await room.save();
+    response.json({ class: updatedRoom });
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
+});
+
+/*
+    As a student, I would like to rate the class difficulty and make comments after the class ends
+- POST: api/class/:classId/survey
+    - send: ratings, comments
+*/
+app.post('/api/class/:classId/survey', async (request, response) => {
+  const { classId } = request.params;
+  const { rating, comment } = request.body;
+  if (!classId || !rating || !comment) {
+    return response.sendStatus(400);
+  }
+  try {
+    const room = await Class.findById(classId);
+    if (!room) {
+      return response.sendStatus(400);
+    }
+    const { ratings, comments } = room.survey;
+    ratings.set(rating, ratings.get(rating) + 1);
+    comments.push(comment);
+    await room.save();
+    response.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
+});
+
+// Teacher
+/*
+As a teacher, I would like create an account with an email and receive a verification code to set the first name, last name, and password of the created account.
+- POST: api/teacher/register
+    - send: email, first name, last name, password
+    - POST: api/send/code
+        - send: email
+    - POST: api/send/code
+        - send: code
+        - receive: true or false
+- POST: api/teacher/login
+    - send: email, first name, last name, password
+*/
+app.post('/api/teacher/register', async (request, response) => {
+  const { email, firstName, lastName, password } = request.body;
   // if email or password does not exist
-  if (!email || !password) {
-    response.send('Email or password is missing!');
-    return;
+  if (!email || !password || !firstName || !lastName || password) {
+    return response.sendStatus(400);
   }
-  new Professor({
+  const teacher = new Teacher({
     email,
-    password
-  })
-    .save()
-    .then(() => {
-      response.json({ success: true });
-    })
-    .catch(err => {
-      console.log('Error in signup: ', err);
-    });
+    firstName,
+    lastName,
+    password,
+    courses: []
+  });
+  try {
+    await teacher.save();
+    response.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
 });
 
-// Professor: Login
+app.post('/api/send/code', async (request, response) => {
+  const { email } = request.body;
+
+  // if email or password does not exist
+  if (!email) {
+    return response.sendStatus(400);
+  }
+  // Create a random code
+  emailConfirmCode = Math.floor(Math.random() * 100 + 54);
+  console.log('email confirmation code ', emailConfirmCode);
+  // Send it to the given email
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: 'Verifcation code for your email account',
+    text: `Hello, please use the following code to verify your email: ${emailConfirmCode}`
+  };
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+      response.sendStatus(500);
+    } else {
+      response.sendStatus(200);
+    }
+  });
+});
+
+app.post('/api/verify/code', async (request, response) => {
+  const { code } = request.body;
+
+  // if code is not given
+  if (!code) {
+    return response.sendStatus(400);
+  }
+  try {
+    if (code !== emailConfirmCode) {
+      console.log('wrong verification code');
+      response.sendStatus(400);
+    } else {
+      response.sendStatus(200);
+    }
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
+});
 app.post(
-  '/api/professor/login',
+  'api/teacher/login',
   passport.authenticate('local'),
   (request, response) => {
     if (request.user) {
-      response.json({ id: request.user.id, professor: request.user.email });
+      response.json({ teacher: request.user });
     } else {
-      response.json({ message: request.message });
+      return response.sendStatus(400);
     }
   }
 );
 
-// Professor: Google login
-app.post(
-  '/api/professor/googleLogin',
-  passport.authenticate('bearer', { session: false }),
-  (request, response, next) => {
-    response.json({ id: request.user.id, professor: request.user.email });
-  }
-);
-
-// Professor: Logout
-app.post('/api/logout', (request, response) => {
-  request.logout();
-  response.json({ success: true });
-});
-
-// Profesoor: Creating a class room
-app.post('/api/professor/create/room', (request, response) => {
-  const { roomName, owner, tags, duration, alert } = request.body;
-  if (!roomName || !owner) {
-    response.send('Something is missing!');
-    return;
-  }
-  Class.findOne({ roomName })
-    .then(room => {
-      if (room) {
-        response.json({ success: false, message: 'room already exists' });
-        return Promise.reject();
-      }
-      // convert tags from array to Map
-      const mapTags = tags.reduce((map, tag) => {
-        map.set(tag, 0);
-        return map;
-      }, new Map());
-      return new Class({
-        students: new Map(),
-        roomName,
-        owner,
-        tags: mapTags,
-        duration,
-        alert,
-        data: [],
-        labels: [],
-        isOver: false
-      }).save();
-    })
-    .then(saved => {
-      response.json({ success: true, room: saved });
-    })
-    .catch(err => {
-      console.log(err);
+/*
+As a teacher, I would like to see the list of courses I made and be able to create a new course (but if the name of the class already exists, I cannot add a class).
+- GET: api/teacher/me
+    - send: request.user
+    - receive: teacher’s profile
+- POST: api/teacher/create/course
+    - send: request.user, course name
+*/
+app.get('/api/teacher/me', (request, response) => {
+  if (request.user) {
+    response.json({
+      success: true,
+      teacher: request.user
     });
-});
-
-// Professor: getting room information
-app.get('/api/professor/get/:roomName', (request, response) => {
-  const { roomName } = request.params;
-  Class.findOne({ roomName })
-    .then(room => {
-      response.json({ success: true, room });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Student: joining a class room (check if room exists)
-app.get('/api/student/join/:roomName', (request, response) => {
-  const { roomName } = request.params;
-  Class.findOne({ roomName })
-    .then(room => {
-      if (room) {
-        if (!room.isOver) {
-          response.json({ success: true, room });
-        } else {
-          response.json({
-            success: false,
-            message: 'This room is not available anymore'
-          });
-        }
-      } else {
-        response.json({ success: false, message: 'This room does not exist' });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Student: Login
-app.post('/api/student/login', (request, response) => {
-  const { roomName, nickname } = request.body;
-  if (!nickname) {
-    response.send('No nickname given!');
-    return;
-  }
-  Class.findOne({ roomName })
-    .then(room => {
-      if (!room) {
-        response.json({ success: false, message: 'room does not exist' });
-        return Promise.reject();
-      }
-      if (room.students.has(nickname)) {
-        response.json({ success: false, message: 'nickname already exists' });
-        return Promise.reject();
-      }
-      room.students.set(nickname, false);
-      return room.save();
-    })
-    .then(updatedRoom => {
-      response.json({ success: true, room: updatedRoom, nickname });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Student: post comments and confusion level rating to the given class
-app.post('/api/student/comment/:roomName', (request, response) => {
-  const { comment, confusionlevel } = request.body;
-  const { roomName } = request.params;
-  if (comment && confusionlevel) {
-    Comment.findOne({ roomName })
-      .then(result => {
-        result.comments.push(comment);
-        const count =
-          parseInt(result.confusionlevel.get(confusionlevel), 10) + 1;
-        result.confusionlevel.set(confusionlevel, count);
-        return result.save();
-      })
-      .then(saved => {
-        response.json({ success: true, survey: saved });
-      })
-      .catch(err => {
-        console.log(err);
-        response.json({ success: false });
-      });
   } else {
-    response.json({ success: false });
+    response.sendStatus(400);
+  }
+});
+app.post('/api/teacher/create/course', async (request, response) => {
+  const { teacher, courseName } = request.body;
+  if (!teacher || !courseName) {
+    return response.sendStatus(400);
+  }
+  const course = new Course({
+    courseName,
+    teacher: teacher._id,
+    dateCreated: Date.now(),
+    classes: []
+  });
+  try {
+    const newCourse = await course.save();
+    response.json({ course: newCourse });
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
   }
 });
 
-// Student: Add tags to the given class
-app.post('/api/tags', (request, response) => {
-  const { roomName, tag } = request.body;
-  Class.findOne({ roomName })
-    .then(room => {
-      const { tags } = room;
-      if (tags.has(tag)) {
-        tags.set(tag, tags.get(tag) + 1);
-      } else {
-        tags.set(tag, 1);
-      }
-      return room.save();
-    })
-    .then(result => {
-      response.json({ success: true, tags: result.tags });
-    })
-    .catch(err => {
-      console.log(err);
+/*
+As a teacher, I would like to see the list of classes I created for each course sorted by their dates added in a descending order.
+- GET: api/teacher/course/:courseName
+    - send: course id
+    - receive: list of classes
+*/
+app.post('/api/teacher/course/:courseId', async (request, response) => {
+  const { courseId } = request.body;
+  if (!courseId) {
+    return response.sendStatus(400);
+  }
+
+  try {
+    const classes = await Course.findById(courseId).populate('classes');
+    response.json({ classes });
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
+});
+
+/*
+As a teacher, I would like to delete a class of a certain course
+- DELETE: api/teacher/course/:courseId
+*/
+app.delete('/api/teacher/course/:courseId', async (request, response) => {
+  const { courseId } = request.body;
+  if (!courseId) {
+    return response.sendStatus(400);
+  }
+
+  try {
+    await Course.findByIdAndDelete(courseId);
+    response.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
+});
+
+/*
+As a teacher, I would like to add a new class for a certain course and set the duration, alert rate, and the agendas. When adding a new class, I would be informed a class code (courseName + date + time i.e. CSCI312-20191029-1230)
+- POST: api/teacher/startClass
+    - send: course name, duration, alert rate, and the agendas
+*/
+app.post('/api/teacher/start/class', async (request, response) => {
+  const { teacher, course, duration, alert, agendas } = request.body;
+  if (!teacher || !course || !duration || !alertRate || !agendas) {
+    return response.sendStatus(400);
+  }
+
+  const { courseId, courseName } = course;
+  const { teacherId } = teacher;
+  if (!courseId || !courseName) {
+    return response.sendStatus(400);
+  }
+  try {
+    const code = 'CSCI302-2019-10-19-12-30';
+    const dateCreated = '2019-10-19-12-30';
+    const newClass = new Class({
+      course: courseId,
+      code,
+      teacher: teacherId,
+      attendees: new Map(),
+      agendas: new Map(),
+      dateCreated,
+      duration,
+      alert,
+      confusionGraph: { data: [], labels: [] },
+      isOver: false
     });
+    await newClass.save();
+    response.json({ class: newClass });
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
 });
 
-// Professor & Student: Get all the list of tags
-app.get('/api/tags/:roomName', (request, response) => {
-  const { roomName } = request.params;
-  Class.findOne({ roomName })
-    .then(room => {
-      response.json({ success: true, tags: room.tags });
-    })
-    .catch(err => {
-      console.log(err);
+/*
+As a teacher, I would like to see the confusion state of the students in class that can be displayed in a graph or in a percentage in real time, a removable class code dialog box, class agendas, list of questions according to their agenda 
+- GET: api/class/:classId (already there)
+    - send: class Id
+    - receive: confusion state of the students, agendas, questions
+*/
+
+/*
+As a teacher, I would like to end the class and let the students do survey for the class
+- POST: api/class/:classId/end
+    - send: class Id
+    - receive: success or not
+*/
+app.post('/api/class/:classId/end', async (request, response) => {
+  const { classId } = request.body;
+  if (!classId) {
+    return response.sendStatus(400);
+  }
+
+  try {
+    await Class.findById(classId, {
+      $set: { isOver: true }
     });
+    response.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    response.sendStatus(500);
+  }
 });
 
-// Professor: Get the confusion states of the students in the given room
-app.get('/api/confusions/:roomName', (request, response) => {
-  // get number of confusions from database
-  const { roomName } = request.params;
-  Class.findOne({ roomName })
-    .then(room => {
-      response.json({ success: true, students: room.students });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Student: Get the confusion state of the given student in the given room
-// so that when the students reload the page, their confusion state will be set
-// to their confusion state not to the default state
-app.get('/api/confusions/:roomName/:student', (request, response) => {
-  const { roomName, student } = request.params;
-  Class.findOne({ roomName })
-    .then(room => {
-      const confusionState = room.students.get(student);
-      response.json({ success: true, confused: confusionState });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Professor: get the list of comments and ratings
-app.get('/api/comments/ratings/:roomName', (request, response) => {
-  const { roomName } = request.params;
-  Comment.findOne({ roomName })
-    .then(survey => {
-      if (survey) {
-        response.json({
-          success: true,
-          comments: survey.comments,
-          ratings: survey.confusionlevel
-        });
-      } else {
-        response.json({ success: false, comments: [], ratings: {} });
-      }
-    })
-    .catch(err => console.log(err));
-});
-
-// Student: Update the confusion state
-app.put('/api/confusions', (request, response) => {
-  const { nickname, roomName, confused } = request.body;
-  Class.findOne({ roomName })
-    .then(room => {
-      room.students.set(nickname, confused);
-      return room.save();
-    })
-    .then(updated => {
-      response.json({ success: true, students: updated.students });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Professor: ending class and creating comments database for the given room
-app.post('/api/end/class', (request, response) => {
-  const { roomName, data, labels, email } = request.body;
-  Class.findOneAndUpdate(
-    { roomName },
-    {
-      $set: { isOver: true, data, labels }
-    }
-  )
-    .then(result => {
-      const map = new Map();
-      map.set('1', 0);
-      map.set('2', 0);
-      map.set('3', 0);
-      map.set('4', 0);
-      map.set('5', 0);
-      return new Comment({
-        comments: [],
-        confusionlevel: map,
-        roomName
-      }).save();
-    })
-    .then(() => {
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: email,
-        subject: `Your class ${roomName} has just finished.`,
-        text: `You can see the reports of the ${roomName} in https://confusion-tracker.herokuapp.com/#/professor/summary/${roomName}`
-      };
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log(`Email sent: ${info.response}`);
-        }
-      });
-      response.json({ success: true });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Student: checking whether the class is over or not
-// this route will be used for changing the students page into the student summary view
-// when the class is over
-app.get('/api/end/class/:roomName', (request, response) => {
-  const { roomName } = request.params;
-  Class.findOne({ roomName })
-    .then(room => {
-      response.json({ isOver: room.isOver });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Professor: get list of all classes that belong to the given professor
-app.get('/api/classes/:professor', (request, response) => {
-  const { professor } = request.params;
-  Class.find({ owner: professor })
-    .then(classes => {
-      response.json({ success: true, classes });
-    })
-    .catch(err => console.log(err));
-});
+/*
+As a teacher, I would like to see the report for each class that contains the agenda, confusion graph, questions uploaded, ratings, and comments.
+- GET: api/class/:classId (already there)
+    - send: class id
+    - receive: confusion state of the students, agendas, questions
+*/
 
 module.exports = {
   app

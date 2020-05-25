@@ -7,16 +7,15 @@ import {
   Button,
   CardTitle
 } from 'reactstrap';
-import { Divider } from 'semantic-ui-react';
+// import { Divider } from 'semantic-ui-react';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import logo from '../../logo.png';
 import Authn from '../Authn/Authn';
-import { GoogleLogin } from 'react-google-login';
-
-const GOOGLE_CLIENT_ID =
-  '909978624274-2vqguu0i6pph09ucsdqtcguntkm81jl2.apps.googleusercontent.com';
+// import { GoogleLogin } from 'react-google-login';
+// const GOOGLE_CLIENT_ID =
+//   '909978624274-2vqguu0i6pph09ucsdqtcguntkm81jl2.apps.googleusercontent.com';
 
 class ProfessorLogin extends Component {
   constructor(props) {
@@ -27,8 +26,8 @@ class ProfessorLogin extends Component {
     };
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handleGoogleLogin = this.handleGoogleLogin.bind(this);
-    this.handleGoogleFailure = this.handleGoogleFailure.bind(this);
+    // this.handleGoogleLogin = this.handleGoogleLogin.bind(this);
+    // this.handleGoogleFailure = this.handleGoogleFailure.bind(this);
     this.login = this.login.bind(this);
   }
 
@@ -43,7 +42,7 @@ class ProfessorLogin extends Component {
       password: event.target.value
     });
   }
-
+  /* 
   handleGoogleLogin(response) {
     fetch('/api/professor/googleLogin', {
       method: 'POST',
@@ -72,7 +71,8 @@ class ProfessorLogin extends Component {
 
   handleGoogleFailure() {
     alert('Login failed!');
-  }
+  } 
+  */
 
   login() {
     fetch('/api/professor/login', {
@@ -99,7 +99,7 @@ class ProfessorLogin extends Component {
         this.props.history.push('/professor/menu');
       })
       .catch(error => {
-        // alert('Invalid email or password. Try again!');
+        alert('Invalid email or password. Try again!');
         console.log(error);
       });
   }
@@ -166,13 +166,13 @@ class ProfessorLogin extends Component {
                 Register
               </Button>
             </Link>
-            <Divider horizontal>Or</Divider>
-            <GoogleLogin
+            {/* <Divider horizontal>Or</Divider> */}
+            {/* <GoogleLogin
               clientId={GOOGLE_CLIENT_ID}
               buttonText="Login with Google"
               onSuccess={this.handleGoogleLogin}
               onFailure={this.handleGoogleFailure}
-            />
+            /> */}
           </Card>
         </Col>
       </Container>

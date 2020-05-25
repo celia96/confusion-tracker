@@ -1,0 +1,24 @@
+{
+  "classId": "5eb8b0de7c213e5d2fa7eb7e",
+  "studentId": "00669468",
+  "questions": {
+    "12345": {
+      "askedBy": "00669468",
+      "upvote": 0,
+      "title": "Question about Redux",
+      "question": "How does the reducer work?"
+    },
+    "23456": {
+      "askedBy": "00669468",
+      "upvote": 4,
+      "title": "Question about Something",
+      "question": "Please explain more about something"
+    },
+    "34567": {
+      "askedBy": "00669468",
+      "upvote": 2,
+      "title": "Question about Something2",
+      "question": "Please explain more about something2"
+    }
+  }
+}
