@@ -26,6 +26,9 @@ class ConfusionGraph extends Component {
             dynamicAnimation: {
               speed: 1000
             }
+          },
+          toolbar: {
+            show: false
           }
         },
         stroke: {
