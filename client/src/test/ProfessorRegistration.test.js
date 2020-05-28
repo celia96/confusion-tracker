@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router-dom';
 
-import ProfessorRegistration from './ProfessorRegistration';
+import ProfessorRegistration from '../components/Legacy/Professor(legacy)/ProfessorRegistration';
 import { findButton } from '../../setupTests';
 
 describe('ProfessorRegistration rendering tests', () => {
