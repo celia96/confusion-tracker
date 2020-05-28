@@ -2,7 +2,7 @@
 /* eslint spaced-comment: "error"*/
 
 // const request = require('supertest');
-const { app } = require('./server');
+const { app } = require('../server');
 // const { Class } = require('./models/models');
 const MongodbMemoryServer = require('mongodb-memory-server').default;
 const mongoose = require('mongoose');
