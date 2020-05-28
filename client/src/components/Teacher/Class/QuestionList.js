@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Badge, Card, CardText, Button } from 'reactstrap';
 import moment from 'moment';
@@ -137,6 +138,12 @@ const styles = {
       borderRadius: '5px'
     }
   }
+};
+
+QuestionList.propTypes = {
+  questions: PropTypes.object.isRequired,
+  collapse: PropTypes.bool,
+  toggle: PropTypes.func
 };
 
 const mapStateToProps = state => {

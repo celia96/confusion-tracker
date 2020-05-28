@@ -1,9 +1,8 @@
 /* eslint-disable react/prefer-stateless-function, react/no-unused-state*/
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button } from 'reactstrap';
 
-import Header from './Header';
 import ConfusionGraph from './ConfusionGraph';
 import QuestionList from './QuestionList';
 import Menu from './Menu';
@@ -11,21 +10,15 @@ import Menu from './Menu';
 import { store } from '../../../redux/store';
 import { updateClass } from '../../../redux/actions';
 
-// import data from '../../../data/data.json';
-
-// const io = require('socket.io-client');
-
 class TeacherClassView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // socket: io(),
       collapseMenu: false,
       collapseQuestions: false,
       questions: new Map(),
       confusionRate: 0,
       attendees: new Map(),
-      className: '',
       menuButtonStyle: {
         width: '30%'
       },
@@ -38,18 +31,17 @@ class TeacherClassView extends Component {
   }
 
   componentDidMount() {
-    // const { classId } = data;
-
     const { socket, classId, updateClassInfo } = this.props;
+
     socket.emit('joinClass', { isOrganizer: true, classId });
     socket.emit('classRoom', classId);
 
     socket.on('classRoom', classRoom => {
-      const { questions, confusionRate, attendees, className } = classRoom;
+      const { questions, confusionRate, attendees } = classRoom;
       // console.log('updated', questions);
       console.log('store ', store.getState());
       updateClassInfo({ questions, students: Object.keys(attendees) });
-      this.setState({ questions, confusionRate, attendees, className });
+      this.setState({ questions, confusionRate, attendees });
     });
     socket.on('message', message => {
       console.log(message);
@@ -71,11 +63,10 @@ class TeacherClassView extends Component {
   }
 
   render() {
-    const { socket, className } = this.props;
+    const { socket } = this.props;
     const { collapseMenu, collapseQuestions } = this.state;
     return (
       <div style={styles.container}>
-        {/* <Header className={className}/> */}
         <Menu collapse={collapseMenu} toggle={this.toggleMenu} />
         <ConfusionGraph socket={socket} />
         <QuestionList
@@ -97,11 +88,15 @@ const styles = {
   }
 };
 
+TeacherClassView.propTypes = {
+  teacherInfo: PropTypes.object,
+  classId: PropTypes.string
+};
+
 const mapStateToProps = state => {
   return {
     teacherInfo: state && state.teacher,
-    classId: state && state.classRoom && state.classRoom.classId,
-    className: state && state.classRoom && state.classRoom.className
+    classId: state && state.classRoom && state.classRoom.classId
   };
 };
 
