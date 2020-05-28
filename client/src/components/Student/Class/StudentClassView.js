@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import Header from './Header';
 import ConfusionToggleButton from './ConfusionToggleButton';
@@ -168,6 +169,16 @@ const styles = {
   addContainer: {
     marginBottom: '20px'
   }
+};
+
+StudentClassView.propTypes = {
+  studentId: PropTypes.string.isRequired,
+  confusionState: PropTypes.bool.isRequired,
+  classId: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+  updateMyConfusion: PropTypes.func.isRequired,
+  joinClass: PropTypes.func,
+  leaveClass: PropTypes.func
 };
 
 const mapStateToProps = state => {

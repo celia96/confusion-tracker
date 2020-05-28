@@ -4,12 +4,16 @@ const defaultState = {
   classId: '5eb8b0de7c213e5d2fa7eb7e',
   className: 'CS101',
   questions: {},
-  students: [],
+  students: [
+    '00669468',
+    '00648681',
+    '00669401',
+    '00669402',
+    '00669403',
+    '00669404'
+  ],
   confusionRate: 0,
-  chart: {
-    data: [],
-    labels: []
-  }
+  chartData: []
 };
 
 const classRoom = (state = defaultState, action) => {

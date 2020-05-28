@@ -1,13 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  Fade,
-  Collapse,
-  Button,
-  Badge,
-  ListGroup,
-  ListGroupItem
-} from 'reactstrap';
+import { Button, Badge, ListGroup, ListGroupItem } from 'reactstrap';
 import moment from 'moment';
 
 import logo from '../../../assets/logo.png';
@@ -107,6 +101,11 @@ const styles = {
     borderColor: '#F5b700',
     width: '100%'
   }
+};
+
+Menu.propTypes = {
+  classInfo: PropTypes.object,
+  teacherInfo: PropTypes.object
 };
 
 const mapStateToProps = state => {

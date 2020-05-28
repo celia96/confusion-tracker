@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Badge, Card, CardText } from 'reactstrap';
 import moment from 'moment';
 
@@ -90,6 +91,11 @@ const styles = {
   questionText: {
     paddingTop: '10px'
   }
+};
+
+QuestionList.propTypes = {
+  questions: PropTypes.object.isRequired,
+  upvoteQuestion: PropTypes.func.isRequired
 };
 
 export default QuestionList;

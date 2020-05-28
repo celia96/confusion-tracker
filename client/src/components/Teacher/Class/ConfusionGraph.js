@@ -1,39 +1,90 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { Button, Text } from 'reactstrap';
-import { Line } from 'react-chartjs-2';
+import Chart from 'react-apexcharts';
+import moment from 'moment';
 
-import { store } from '../../../redux/store';
+// import { store } from '../../../redux/store';
 import { updateClass } from '../../../redux/actions';
 
 class ConfusionGraph extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      labels:
-        (this.props.confusionChart && this.props.confusionChart.labels) || [],
-      data: (this.props.confusionChart && this.props.confusionChart.data) || [],
-      tags: [],
-      duration: 5,
-      alert: 50,
       confusionRate: 0,
-      attendees: []
+      attendees: [],
+      options: {
+        chart: {
+          id: 'realtime',
+          height: 700,
+          width: '100%',
+          type: 'line',
+          animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+              speed: 1000
+            }
+          },
+          toolbar: {
+            show: false
+          }
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        markers: {
+          size: 0
+        },
+        title: {
+          text: 'Dynamic Updating Chart',
+          align: 'left'
+        },
+        xaxis: {
+          type: 'numeric',
+          labels: {
+            formatter: function(time) {
+              return moment(time).format('h:mmA');
+            }
+          }
+        },
+        yaxis: {
+          min: 0,
+          max: this.props.students.length,
+          tickAmount: 10,
+          forceNiceScale: this.props.students.length < 10 ? true : false,
+          labels: {
+            formatter: function(val) {
+              return val.toFixed(0);
+            }
+          }
+        }
+      },
+      series: [
+        {
+          name: 'confusion',
+          data: (this.props.chartData && this.props.chartData) || []
+        }
+      ]
     };
     this.fetchConfusion = this.fetchConfusion.bind(this);
   }
 
   componentDidMount() {
     // console.log('store ', store.getState());
-    // this.fetchConfusion();
-    // this.interval = setInterval(() => this.fetchConfusion(), 5000);
+    this.fetchConfusion();
+    this.interval = setInterval(() => {
+      this.fetchConfusion();
+    }, 5000);
   }
 
-  // componentWillUnmount() {
-  //   clearInterval(this.interval);
-  // }
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
 
   fetchConfusion() {
-    const { data, labels } = this.state;
+    const { options, series } = this.state;
     const { classId, updateClassInfo } = this.props;
     fetch(`/api/class/${classId}`)
       .then(response => {
@@ -42,119 +93,43 @@ class ConfusionGraph extends Component {
       })
       .then(classRoom => {
         const { confusionRate, attendees } = classRoom;
+
+        const chartData = series.slice()[0].data.slice();
+        const data = [new Date().getTime(), confusionRate];
+        chartData.push(data);
+
         this.setState({
+          options: {
+            ...options,
+            yaxis: {
+              ...options.yaxis,
+              max: Object.keys(attendees).length
+            }
+          },
+          series: [
+            {
+              ...series[0],
+              data: chartData
+            }
+          ],
+          attendees: Object.keys(attendees),
           confusionRate
         });
-        const dataCopy = data.slice();
-        dataCopy.push(confusionRate);
 
-        const labelsCopy = labels.slice();
-        labelsCopy.push(new Date());
-
-        const chart = {
-          data: dataCopy,
-          labels: labelsCopy
-        };
-
-        console.log('confusion rate ', confusionRate);
-        updateClassInfo({ chart, confusionRate });
-        console.log('store ', store.getState());
-        this.setState({
-          data: dataCopy,
-          labels: labelsCopy,
-          attendees: Object.keys(attendees)
+        updateClassInfo({
+          chartData,
+          confusionRate,
+          students: Object.keys(attendees)
         });
       })
       .catch(err => console.log(err));
   }
 
   render() {
-    const { data, labels, confusionRate } = this.state;
-    const currTime = new Date();
-    const endOfClassTime = new Date(
-      currTime.setMinutes(currTime.getMinutes() + this.state.duration)
-    );
-    const chartData = {
-      labels,
-      datasets: [
-        {
-          data,
-          borderColor: '#3e95cd',
-          backgroundColor: ['rgba(117, 184, 255, 0.2)']
-        }
-      ]
-    };
-
+    const { options, series } = this.state;
     return (
-      <div style={styles.container}>
-        <div>Confusion Rate: {confusionRate}</div>
-        <div>
-          <div className="chart">
-            <Line
-              width={800}
-              height={290}
-              data={chartData}
-              options={{
-                bezierCurve: false,
-                tooltips: {
-                  custom: function(tooltip) {
-                    if (!tooltip) return;
-                    // disable displaying the color box;
-                    tooltip.displayColors = false;
-                  },
-                  callbacks: {
-                    title: function(tooltipItem, data) {
-                      console.log(tooltipItem, data);
-                      return '';
-                    },
-                    label: function(tooltipItem, data) {
-                      //var datasetLabel = '';
-                      //var label = data.labels[tooltipItem.index]; a
-                      return `Number of Confused Students: ${
-                        data.datasets[tooltipItem.datasetIndex].data[
-                          tooltipItem.index
-                        ]
-                      }`;
-                    }
-                  }
-                },
-                legend: {
-                  display: false
-                },
-                scales: {
-                  xAxes: [
-                    {
-                      type: 'time',
-                      time: {
-                        max: endOfClassTime,
-                        unit: 'minute'
-                      },
-                      distibution: 'linear'
-                    }
-                  ],
-                  yAxes: [
-                    {
-                      ticks: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: this.state.studentsPresent,
-                        stepSize: 1
-                      }
-                    }
-                  ]
-                }
-              }}
-            />
-          </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: '10px'
-          }}
-        />
+      <div id="chart" style={styles.container}>
+        <Chart options={options} series={series} type="line" width="1000" />
       </div>
     );
   }
@@ -164,16 +139,23 @@ const styles = {
   container: {
     flex: 1,
     display: 'flex',
-    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
   }
 };
 
+ConfusionGraph.propTypes = {
+  classId: PropTypes.string.isRequired,
+  students: PropTypes.array.isRequired,
+  chartData: PropTypes.array.isRequired,
+  updateClassInfo: PropTypes.func.isRequired
+};
+
 const mapStateToProps = state => {
   return {
     classId: state && state.classRoom && state.classRoom.classId,
-    confusionChart: state && state.classRoom && state.classRoom.chart
+    students: state && state.classRoom && state.classRoom.students,
+    chartData: state && state.classRoom && state.classRoom.chartData
   };
 };
 
