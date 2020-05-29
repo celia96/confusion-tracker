@@ -6,6 +6,9 @@ Confusion Tracker Application keeps track of students’ comprehension in class 
 ## Heroku link
 https://confusion-tracker.herokuapp.com/
 
+## Travis Status
+[![Build Status](https://travis-ci.com/celia96/confusion-tracker.svg?branch=master)](https://travis-ci.com/celia96/confusion-tracker)
+
 ## Components
 ### Student's View
 
