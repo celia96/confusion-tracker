@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+  - "lts/dubnium"
+before_script:
+  - export TZ=America/New_York
+install:
+    - npm ci
+    - npm ci --prefix client
+    - npm ci --prefix server
+cache:
+  directories:
+    - $HOME/.npm
+env:
+  - 
+script:
+  - npm run build --prefix client
+  - npm test --prefix client
+  - npm run lint --prefix client
+  - npm run lint --prefix server
