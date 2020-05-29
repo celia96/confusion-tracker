@@ -10,8 +10,6 @@ install:
 cache:
   directories:
     - $HOME/.npm
-env:
-  - 
 script:
   - npm run build --prefix client
   - npm test --prefix client
