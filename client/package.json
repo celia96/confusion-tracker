@@ -6,7 +6,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "jest",
     "eject": "react-scripts eject",
     "lint": "eslint ."
   },
@@ -45,11 +45,13 @@
     "typescript": "^3.4.3"
   },
   "devDependencies": {
-    "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.9.1",
+    "@babel/preset-env": "^7.10.1",
+    "@babel/preset-react": "^7.10.1",
+    "@testing-library/react": "^10.0.4",
+    "babel-jest": "^26.0.1",
     "eslint-config-prettier": "^4.1.0",
-    "jest-enzyme": "^7.0.1",
-    "react-test-renderer": "^16.8.1"
+    "jest": "^26.0.1",
+    "react-test-renderer": "^16.13.1"
   },
   "browserslist": [
     ">0.2%",
