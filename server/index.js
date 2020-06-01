@@ -7,10 +7,10 @@ const models = require('./models/models');
 const { Class } = models;
 
 // Socket IO setup
-const server = http.createServer(app).listen(process.env.PORT || 3001);
+const server = http.createServer(app);
 const io = require('socket.io')(server);
 
-server.listen(3001);
+server.listen(process.env.PORT || 3001);
 
 console.log('Listening on port %d', server.address().port); // eslint-disable-line no-console
 

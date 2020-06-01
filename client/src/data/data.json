@@ -20,5 +20,89 @@
       "title": "Question about Something2",
       "question": "Please explain more about something2"
     }
-  }
+  },
+  "courses": [
+    {
+      "id": "5eb8",
+      "courseName": "CS101",
+      "teacher": "Celia Choy",
+      "dateCreated": 1590811677563,
+      "classes": [
+        "5eb8b0de7c213e5d2fa7eb71",
+        "5eb8b0de7c213e5d2fa7eb72",
+        "5eb8b0de7c213e5d2fa7eb73"
+      ],
+      "students": [
+        {
+          "name": "Soobin Choi",
+          "studentId": "00669461",
+          "email": "soobin@gmail.com"
+        },
+        {
+          "name": "Jin Choi",
+          "studentId": "00669462",
+          "email": "jin@gmail.com"
+        },
+        {
+          "name": "Daniel Choi",
+          "studentId": "00669463",
+          "email": "daniel@gmail.com"
+        },
+        {
+          "name": "Chul Choi",
+          "studentId": "00669464",
+          "email": "chul@gmail.com"
+        }
+      ]
+    },
+    {
+      "courseName": "CS102",
+      "teacher": "Celia Choy",
+      "dateCreated": 1590811677563,
+      "classes": ["5eb8b0de7c213e5d2fa7eb7e"],
+      "students": [
+        {
+          "name": "Soobin Choi",
+          "studentId": "00669461",
+          "email": "soobin@gmail.com"
+        },
+        {
+          "name": "Jin Choi",
+          "studentId": "00669462",
+          "email": "jin@gmail.com"
+        },
+        {
+          "name": "Daniel Choi",
+          "studentId": "00669463",
+          "email": "daniel@gmail.com"
+        },
+        {
+          "name": "Chul Choi",
+          "studentId": "00669464",
+          "email": "chul@gmail.com"
+        }
+      ]
+    },
+    {
+      "courseName": "CS201",
+      "teacher": "Celia Choy",
+      "dateCreated": 1590811677563,
+      "classes": ["5eb8b0de7c213e5d2fa7eb7e"],
+      "students": []
+    },
+    {
+      "courseName": "CS202",
+      "teacher": "Celia Choy",
+      "dateCreated": 1590811677563,
+      "classes": ["5eb8b0de7c213e5d2fa7eb7e"],
+      "students": []
+    },
+    {
+      "courseName": "CS302",
+      "teacher": "Celia Choy",
+      "dateCreated": 1590811677563,
+      "classes": ["5eb8b0de7c213e5d2fa7eb7e"],
+      "students": []
+    }
+  ]
 }
