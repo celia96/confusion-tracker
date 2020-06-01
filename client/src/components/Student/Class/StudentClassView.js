@@ -14,6 +14,46 @@ import {
 } from '../../../redux/actions';
 import { store } from '../../../redux/store';
 
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    maxHeight: '100vh'
+  },
+  contentContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    flex: 2,
+    height: 'calc(100vh - 58px)'
+  },
+  left: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    marginLeft: '100px'
+  },
+  right: {
+    flex: 1,
+    margin: '20px',
+    marginLeft: '100px',
+    marginRight: '100px',
+    overflow: 'auto',
+    backgroundColor: '#6495ed',
+    borderRadius: '5px'
+  },
+  buttonContainer: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  addContainer: {
+    marginBottom: '20px'
+  }
+};
+
 class StudentClassView extends Component {
   constructor(props) {
     super(props);
@@ -132,46 +172,6 @@ class StudentClassView extends Component {
     );
   }
 }
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
-  contentContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    flex: 2,
-    height: 'calc(100vh - 58px)'
-  },
-  left: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    marginLeft: '100px'
-  },
-  right: {
-    flex: 1,
-    margin: '20px',
-    marginLeft: '100px',
-    marginRight: '100px',
-    overflow: 'auto',
-    backgroundColor: '#6495ed',
-    borderRadius: '5px'
-  },
-  buttonContainer: {
-    flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  addContainer: {
-    marginBottom: '20px'
-  }
-};
 
 StudentClassView.propTypes = {
   studentId: PropTypes.string.isRequired,

@@ -1,4 +1,4 @@
-import {
+/* import {
   Container,
   Col,
   Label,
@@ -7,7 +7,7 @@ import {
   Button,
   CardTitle
 } from 'reactstrap';
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import logo from '../../../logo.png';
 
@@ -151,3 +151,4 @@ TeacherRegistration.propTypes = {
 };
 
 export default TeacherRegistration;
+ */

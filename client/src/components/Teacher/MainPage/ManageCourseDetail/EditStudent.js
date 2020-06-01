@@ -13,6 +13,20 @@ import {
   Col
 } from 'reactstrap';
 
+const styles = {
+  saveButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  },
+  submitForm: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-end'
+  }
+};
+
 const StudentForm = ({ studentInfo }) => {
   const { name, studentId, email } = studentInfo;
   const [nameValue, setName] = useState(name);
@@ -77,20 +91,6 @@ const EditStudent = ({ isOpen, toggle, studentInfo }) => {
       </ModalBody>
     </Modal>
   );
-};
-
-const styles = {
-  saveButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-  },
-  submitForm: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-end'
-  }
 };
 
 EditStudent.propTypes = {

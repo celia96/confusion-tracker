@@ -18,6 +18,31 @@ import {
   Table
 } from 'reactstrap';
 
+const styles = {
+  modalFooter: {
+    borderTop: '0px'
+  },
+  optionContainer: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  },
+  addButton: {
+    backgroundColor: '#6495ed',
+    borderColor: '#6495ed'
+  },
+  saveButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  },
+  submitForm: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-end'
+  }
+};
+
 const AddFileForm = () => (
   <Form>
     <FormGroup>
@@ -105,7 +130,7 @@ const AddedStudents = ({ students }) => (
         <th>Name</th>
         <th>Student ID</th>
         <th>Email</th>
-        <th></th>
+        <th />
       </tr>
     </thead>
     <tbody>
@@ -202,31 +227,6 @@ const AddStudent = ({ isOpen, toggle }) => {
       </ModalFooter>
     </Modal>
   );
-};
-
-const styles = {
-  modalFooter: {
-    borderTop: '0px'
-  },
-  optionContainer: {
-    display: 'flex',
-    justifyContent: 'space-between'
-  },
-  addButton: {
-    backgroundColor: '#6495ed',
-    borderColor: '#6495ed'
-  },
-  saveButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-  },
-  submitForm: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'flex-end'
-  }
 };
 
 AddStudent.propTypes = {

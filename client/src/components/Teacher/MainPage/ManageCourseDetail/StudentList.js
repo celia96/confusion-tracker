@@ -6,79 +6,6 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { TiEdit } from 'react-icons/ti';
 import { Table, Button, Badge } from 'reactstrap';
 
-const StudentList = ({
-  students,
-  loadStudent,
-  toggleAddStudent,
-  toggleEditStudent,
-  toggleDeleteStudent
-}) => {
-  return (
-    <div style={styles.container}>
-      <div style={styles.subContainer}>
-        <div style={styles.subHeaderContainer}>
-          <div style={styles.iconContainer}>
-            <span style={styles.titleText}>Students</span>
-            <span style={{ margin: '5px' }} />
-            <BsPeopleFill size="30" />
-            <span style={{ margin: '1px' }} />
-            <Badge style={styles.badge}>4</Badge>
-          </div>
-          <Button onClick={toggleAddStudent} style={styles.button}>
-            <FaUserPlus />
-            <span style={{ margin: '5px' }} />
-            <span>Add Students</span>
-          </Button>
-        </div>
-        <Table>
-          <thead style={{ backgroundColor: '#f5f5f5' }}>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Student ID</th>
-              <th>Email</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student, index) => {
-              const { studentId, name, email } = student;
-              return (
-                <tr key={studentId}>
-                  <th scope="row">
-                    <FaRegUserCircle size="25" style={{ margin: '5px' }} />
-                  </th>
-                  {/* <th scope="row">{index+1}</th> */}
-                  <td>{name}</td>
-                  <td>{studentId}</td>
-                  <td>{email}</td>
-                  <td
-                    onClick={() => {
-                      loadStudent(student);
-                      toggleEditStudent();
-                    }}
-                  >
-                    <TiEdit style={styles.pointer} size="23" />
-                  </td>
-                  <td
-                    onClick={() => {
-                      loadStudent(student);
-                      toggleDeleteStudent();
-                    }}
-                  >
-                    <RiDeleteBin6Line style={styles.pointer} size="20" />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </div>
-    </div>
-  );
-};
-
 const styles = {
   container: {
     display: 'flex',
@@ -124,6 +51,78 @@ const styles = {
   pointer: {
     cursor: 'pointer'
   }
+};
+
+const StudentList = ({
+  students,
+  loadStudent,
+  toggleAddStudent,
+  toggleEditStudent,
+  toggleDeleteStudent
+}) => {
+  return (
+    <div style={styles.container}>
+      <div style={styles.subContainer}>
+        <div style={styles.subHeaderContainer}>
+          <div style={styles.iconContainer}>
+            <span style={styles.titleText}>Students</span>
+            <span style={{ margin: '5px' }} />
+            <BsPeopleFill size="30" />
+            <span style={{ margin: '1px' }} />
+            <Badge style={styles.badge}>4</Badge>
+          </div>
+          <Button onClick={toggleAddStudent} style={styles.button}>
+            <FaUserPlus />
+            <span style={{ margin: '5px' }} />
+            <span>Add Students</span>
+          </Button>
+        </div>
+        <Table>
+          <thead style={{ backgroundColor: '#f5f5f5' }}>
+            <tr>
+              <th />
+              <th>Name</th>
+              <th>Student ID</th>
+              <th>Email</th>
+              <th />
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {students.map(student => {
+              const { studentId, name, email } = student;
+              return (
+                <tr key={studentId}>
+                  <th scope="row" style={{ textAlign: 'center' }}>
+                    <FaRegUserCircle size="25" style={{ margin: '5px' }} />
+                  </th>
+                  <td>{name}</td>
+                  <td>{studentId}</td>
+                  <td>{email}</td>
+                  <td
+                    onClick={() => {
+                      loadStudent(student);
+                      toggleEditStudent();
+                    }}
+                  >
+                    <TiEdit style={styles.pointer} size="23" />
+                  </td>
+                  <td
+                    onClick={() => {
+                      loadStudent(student);
+                      toggleDeleteStudent();
+                    }}
+                  >
+                    <RiDeleteBin6Line style={styles.pointer} size="20" />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      </div>
+    </div>
+  );
 };
 
 StudentList.propTypes = {

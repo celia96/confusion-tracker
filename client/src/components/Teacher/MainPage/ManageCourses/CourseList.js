@@ -3,6 +3,30 @@ import PropTypes from 'prop-types';
 import { BsPeopleFill } from 'react-icons/bs';
 import { Table, Button, Badge } from 'reactstrap';
 
+const styles = {
+  container: {
+    padding: '50px',
+    paddingTop: '30px'
+  },
+  tableContainer: {
+    textAlign: 'center'
+  },
+  button: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+    // marginRight: '20px'
+  },
+  aligned: {
+    verticalAlign: 'middle'
+  },
+  badge: {
+    fontSize: 'xx-small',
+    backgroundColor: '#6495ed'
+  }
+};
+
 const CourseList = ({ courses }) => {
   return (
     <div style={styles.container}>
@@ -12,7 +36,7 @@ const CourseList = ({ courses }) => {
             <th style={{ width: '5%' }}>#</th>
             <th style={{ width: '15%' }}>Course Name</th>
             <th style={{ width: '15%' }}>Students</th>
-            <th style={{ width: '55%' }}></th>
+            <th style={{ width: '55%' }} />
             <th>Archive</th>
           </tr>
         </thead>
@@ -40,30 +64,6 @@ const CourseList = ({ courses }) => {
       </Table>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    padding: '50px',
-    paddingTop: '30px'
-  },
-  tableContainer: {
-    textAlign: 'center'
-  },
-  button: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-    // marginRight: '20px'
-  },
-  aligned: {
-    verticalAlign: 'middle'
-  },
-  badge: {
-    fontSize: 'xx-small',
-    backgroundColor: '#6495ed'
-  }
 };
 
 CourseList.propTypes = {

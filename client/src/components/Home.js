@@ -3,6 +3,20 @@ import { Link } from 'react-router-dom';
 import { Container, Col, Button } from 'reactstrap';
 import logo from '../assets/logo.png';
 
+const styles = {
+  logo: {
+    maxWidth: '400px',
+    margin: '20px'
+  },
+  button: {
+    backgroundColor: '#75b8ff',
+    borderColor: '#75b8ff'
+  },
+  link: {
+    textDecoration: 'none'
+  }
+};
+
 const MainPage = () => (
   <Container>
     <div style={{ margin: '30px' }} />
@@ -18,19 +32,5 @@ const MainPage = () => (
     </Col>
   </Container>
 );
-
-const styles = {
-  logo: {
-    maxWidth: '400px',
-    margin: '20px'
-  },
-  button: {
-    backgroundColor: '#75b8ff',
-    borderColor: '#75b8ff'
-  },
-  link: {
-    textDecoration: 'none'
-  }
-};
 
 export default MainPage;

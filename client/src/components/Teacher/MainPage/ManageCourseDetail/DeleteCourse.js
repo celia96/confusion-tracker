@@ -2,6 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
+const styles = {
+  modalFooter: {
+    borderTop: '0px'
+  },
+  modalBody: {
+    fontWeight: '600'
+  },
+  confirmButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  }
+};
+
 const DeleteCourse = ({ isOpen, toggle, courseName }) => {
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
@@ -17,21 +32,6 @@ const DeleteCourse = ({ isOpen, toggle, courseName }) => {
       </ModalFooter>
     </Modal>
   );
-};
-
-const styles = {
-  modalFooter: {
-    borderTop: '0px'
-  },
-  modalBody: {
-    fontWeight: '600'
-  },
-  confirmButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-  }
 };
 
 DeleteCourse.propTypes = {

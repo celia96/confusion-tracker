@@ -1,6 +1,4 @@
-/* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
-/* eslint no-unused-vars: ["error", { "args": "none" }] */
-
+/* eslint-disable no-console */
 const express = require('express');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
@@ -36,8 +34,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-let emailConfirmCode;
-
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Resolve client build directory as absolute path to avoid errors in express
@@ -70,7 +66,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  Professor.findById(id, (err, user) => {
+  Teacher.findById(id, (err, user) => {
     done(err, user);
   });
 });
@@ -78,9 +74,9 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new LocalStrategy(
     { usernameField: 'email', passwordField: 'password' },
-    function(email, password, done) {
+    (email, password, done) => {
       // Find the user with the given username
-      User.findOne({ email }, function(err, user) {
+      Teacher.findOne({ email }, function(err, user) {
         if (err) {
           return done(err);
         }
@@ -98,7 +94,7 @@ passport.use(
 
 passport.use(
   new BearerStrategy(function(token, done) {
-    Professor.findOne({ token: token }, function(err, user) {
+    Teacher.findOne({ token }, function(err, user) {
       if (err) {
         return done(err);
       }
@@ -111,7 +107,7 @@ passport.use(
 );
 
 /*
-As a student and a professor, I would like to have today’s agenda, set by the instructor, displayed in my screen.
+As a student and a teacher, I would like to have today’s agenda, set by the instructor, displayed in my screen.
 - GET: api/class/:classId
     - send: class id
     - receive: all the info about the class
@@ -126,9 +122,9 @@ app.get('/api/class/:classId', async (request, response) => {
     const classRoom = await Class.findById(classId);
     // const classRoom = await Class.findOne({ classId });
     if (!classRoom) return response.sendStatus(400);
-    response.json(classRoom);
+    return response.json(classRoom);
   } catch (err) {
-    response.sendStatus(500);
+    return response.sendStatus(500);
   }
 });
 
@@ -247,7 +243,8 @@ app.post('/api/send/code', async (request, response) => {
     return response.sendStatus(400);
   }
   // Create a random code
-  emailConfirmCode = Math.floor(Math.random() * 100 + 54);
+  const emailConfirmCode = Math.floor(Math.random() * 100 + 54);
+  // save the code to database
   console.log('email confirmation code ', emailConfirmCode);
   // Send it to the given email
   const mailOptions = {
@@ -274,7 +271,8 @@ app.post('/api/verify/code', async (request, response) => {
     return response.sendStatus(400);
   }
   try {
-    if (code !== emailConfirmCode) {
+    // compare the code in database
+    if (code !== '') {
       console.log('wrong verification code');
       response.sendStatus(400);
     } else {
@@ -315,6 +313,7 @@ app.get('/api/teacher/me', (request, response) => {
     response.sendStatus(400);
   }
 });
+
 app.post('/api/teacher/create/course', async (request, response) => {
   const { teacher, courseName } = request.body;
   if (!teacher || !courseName) {

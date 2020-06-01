@@ -27,6 +27,54 @@ import EditCourse from './EditCourse';
 import DeleteStudent from './DeleteStudent';
 import DeleteCourse from './DeleteCourse';
 
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    maxHeight: '100vh'
+  },
+  subContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: '50px',
+    marginLeft: '70px',
+    marginRight: '70px'
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  titleText: {
+    fontSize: '30px',
+    fontWeight: '600'
+  },
+  button: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    borderRadius: '50px',
+    fontWeight: '600',
+    color: '#614908',
+    padding: '10px',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  navContainer: {
+    margin: '50px',
+    marginTop: '30px'
+  },
+  delete: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end'
+  },
+  pointer: {
+    cursor: 'pointer'
+  }
+};
+
 class ManageCourseDetail extends Component {
   constructor(props) {
     super(props);
@@ -236,54 +284,6 @@ class ManageCourseDetail extends Component {
   }
 }
 
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
-  subContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: '50px',
-    marginLeft: '70px',
-    marginRight: '70px'
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  titleText: {
-    fontSize: '30px',
-    fontWeight: '600'
-  },
-  button: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    borderRadius: '50px',
-    fontWeight: '600',
-    color: '#614908',
-    padding: '10px',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  navContainer: {
-    margin: '50px',
-    marginTop: '30px'
-  },
-  delete: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end'
-  },
-  pointer: {
-    cursor: 'pointer'
-  }
-};
-
 ManageCourseDetail.propTypes = {
   teacherInfo: PropTypes.object.isRequired
 };
@@ -294,7 +294,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = () => {
   return {};
 };
 

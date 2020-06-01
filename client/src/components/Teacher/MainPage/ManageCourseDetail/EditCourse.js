@@ -12,6 +12,15 @@ import {
   FormGroup
 } from 'reactstrap';
 
+const styles = {
+  saveButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  }
+};
+
 const CourseForm = ({ courseName }) => {
   const [nameValue, setName] = useState(courseName);
   return (
@@ -46,15 +55,6 @@ const EditCourse = ({ isOpen, toggle, courseName }) => {
       </ModalFooter>
     </Modal>
   );
-};
-
-const styles = {
-  saveButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-  }
 };
 
 EditCourse.propTypes = {

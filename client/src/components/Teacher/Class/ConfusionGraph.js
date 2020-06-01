@@ -7,13 +7,21 @@ import moment from 'moment';
 // import { store } from '../../../redux/store';
 import { updateClass } from '../../../redux/actions';
 
+const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+};
+
 class ConfusionGraph extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       confusionRate: 0,
-      attendees: [],
       options: {
         chart: {
           id: 'realtime',
@@ -112,7 +120,6 @@ class ConfusionGraph extends Component {
               data: chartData
             }
           ],
-          attendees: Object.keys(attendees),
           confusionRate
         });
 
@@ -126,23 +133,17 @@ class ConfusionGraph extends Component {
   }
 
   render() {
-    const { options, series } = this.state;
+    const { confusionRate, options, series } = this.state;
     return (
-      <div id="chart" style={styles.container}>
-        <Chart options={options} series={series} type="line" width="1000" />
+      <div>
+        <div>Confusion: {confusionRate}</div>
+        <div id="chart" style={styles.container}>
+          <Chart options={options} series={series} type="line" width="1000" />
+        </div>
       </div>
     );
   }
 }
-
-const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-};
 
 ConfusionGraph.propTypes = {
   classId: PropTypes.string.isRequired,
@@ -165,7 +166,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConfusionGraph);
+export default connect(mapStateToProps, mapDispatchToProps)(ConfusionGraph);

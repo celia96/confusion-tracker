@@ -2,16 +2,32 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, CardTitle, CardText, Input } from 'reactstrap';
 
+const styles = {
+  container: {
+    backgroundColor: '#6495ed',
+    borderColor: '#6495ed'
+  },
+  cardTitle: {
+    fontWeight: 'bold',
+    color: '#fff'
+  },
+  cardInput: {
+    height: '100px'
+  },
+  submitButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700'
+  }
+};
+
 const AddQuestion = ({ text, onTextChange, submitQuestion }) => {
   return (
-    <Card body style={{ backgroundColor: '#6495ed', borderColor: '#6495ed' }}>
-      <CardTitle style={{ fontWeight: 'bold', color: '#fff' }}>
-        Post a Question
-      </CardTitle>
+    <Card body style={styles.container}>
+      <CardTitle style={styles.cardTitle}>Post a Question</CardTitle>
       <CardText>
         <Input
           type="textarea"
-          style={{ height: '100px' }}
+          style={styles.cardInput}
           maxLength={300}
           name="question"
           id="questionText"
@@ -20,10 +36,7 @@ const AddQuestion = ({ text, onTextChange, submitQuestion }) => {
           onChange={onTextChange}
         />
       </CardText>
-      <Button
-        style={{ backgroundColor: '#F5b700', borderColor: '#F5b700' }}
-        onClick={submitQuestion}
-      >
+      <Button style={styles.submitButton} onClick={submitQuestion}>
         Submit
       </Button>
     </Card>

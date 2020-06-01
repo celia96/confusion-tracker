@@ -9,21 +9,22 @@ import Menu from './Menu';
 import { store } from '../../../redux/store';
 import { updateClass } from '../../../redux/actions';
 
+const styles = {
+  container: {
+    height: '100vh',
+    maxHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  }
+};
+
 class TeacherClassView extends Component {
   constructor(props) {
     super(props);
     this.state = {
       collapseMenu: false,
-      collapseQuestions: false,
-      questions: new Map(),
-      confusionRate: 0,
-      attendees: new Map(),
-      menuButtonStyle: {
-        width: '30%'
-      },
-      questionsButtonStyle: {
-        width: '30%'
-      }
+      collapseQuestions: false
     };
     this.toggleMenu = this.toggleMenu.bind(this);
     this.toggleQuestions = this.toggleQuestions.bind(this);
@@ -36,11 +37,10 @@ class TeacherClassView extends Component {
     socket.emit('classRoom', classId);
 
     socket.on('classRoom', classRoom => {
-      const { questions, confusionRate, attendees } = classRoom;
+      const { questions, attendees } = classRoom;
       // console.log('updated', questions);
       console.log('store ', store.getState());
       updateClassInfo({ questions, students: Object.keys(attendees) });
-      this.setState({ questions, confusionRate, attendees });
     });
     socket.on('message', message => {
       console.log(message);
@@ -63,12 +63,13 @@ class TeacherClassView extends Component {
 
   render() {
     const { socket } = this.props;
-    const { collapseMenu, collapseQuestions } = this.state;
+    const { questions, collapseMenu, collapseQuestions } = this.state;
     return (
       <div style={styles.container}>
         <Menu collapse={collapseMenu} toggle={this.toggleMenu} />
         <ConfusionGraph socket={socket} />
         <QuestionList
+          questions={questions}
           collapse={collapseQuestions}
           toggle={this.toggleQuestions}
         />
@@ -76,16 +77,6 @@ class TeacherClassView extends Component {
     );
   }
 }
-
-const styles = {
-  container: {
-    height: '100vh',
-    maxHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  }
-};
 
 TeacherClassView.propTypes = {
   teacherInfo: PropTypes.object,

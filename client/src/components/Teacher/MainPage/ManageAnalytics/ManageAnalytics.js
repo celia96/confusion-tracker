@@ -9,66 +9,6 @@ import Header from '../Header';
 
 import data from '../../../../data/data.json';
 
-class ManageAnalytics extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      classes: [],
-      courseName: '',
-      dateCreated: ''
-    };
-    this.toggle = this.toggle.bind(this);
-  }
-
-  componentDidMount() {
-    // fetch
-    const timestamp =
-      data.courses && data.courses[0] && data.courses[0].dateCreated;
-    const dateCreated = moment(timestamp).format('YYYY/MM/DD');
-    const classes =
-      (data.courses && data.courses[0] && data.courses[0].classes) || [];
-    const courseName =
-      (data.courses && data.courses[0] && data.courses[0].courseName) || '';
-
-    this.setState({
-      classes,
-      courseName,
-      dateCreated
-    });
-  }
-
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
-    }
-  }
-
-  render() {
-    const { dateCreated, courseName } = this.state;
-    const { teacherInfo } = this.props;
-
-    return (
-      <div style={styles.container}>
-        <Header teacherInfo={teacherInfo} />
-        <div style={styles.subContainer}>
-          <div style={styles.title}>
-            <IoMdAnalytics size="40" />
-            <span style={{ margin: '5px' }} />
-            <span style={styles.titleText}>
-              {courseName} : {dateCreated}
-            </span>
-          </div>
-          <div style={styles.pointer}>
-            <RiDeleteBin6Line size="40" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
 const styles = {
   container: {
     display: 'flex',
@@ -112,6 +52,50 @@ const styles = {
   }
 };
 
+class ManageAnalytics extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      courseName: '',
+      timestamp: ''
+    };
+  }
+
+  componentDidMount() {
+    // fetch
+    const { dateCreated, courseName } = data;
+    const timestamp = moment(dateCreated).format('YYYY/MM/DD');
+
+    this.setState({
+      courseName,
+      timestamp
+    });
+  }
+
+  render() {
+    const { timestamp, courseName } = this.state;
+    const { teacherInfo } = this.props;
+
+    return (
+      <div style={styles.container}>
+        <Header teacherInfo={teacherInfo} />
+        <div style={styles.subContainer}>
+          <div style={styles.title}>
+            <IoMdAnalytics size="40" />
+            <span style={{ margin: '5px' }} />
+            <span style={styles.titleText}>
+              {courseName} : {timestamp}
+            </span>
+          </div>
+          <div style={styles.pointer}>
+            <RiDeleteBin6Line size="40" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
 ManageAnalytics.propTypes = {
   teacherInfo: PropTypes.object.isRequired
 };
@@ -122,7 +106,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = () => {
   return {};
 };
 

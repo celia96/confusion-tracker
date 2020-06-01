@@ -10,7 +10,34 @@ import {
 } from 'reactstrap';
 
 import logo from '../../../assets/image.png';
-// isOpen={dropdownOpen} toggle={toggle}
+
+const styles = {
+  container: {
+    height: '58px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#6495ed'
+  },
+  logo: {
+    maxHeight: '45px',
+    marginLeft: '20px'
+  },
+  name: {
+    color: '#fff',
+    fontSize: '20px',
+    fontWeight: '600'
+  },
+  profile: {
+    display: 'flex',
+    alignItems: 'center',
+    color: '#fff',
+    fontSize: '20px',
+    marginRight: '20px'
+  }
+};
+
 const ProfileDropdown = ({ isOpen, toggle }) => (
   <Dropdown isOpen={isOpen} toggle={toggle}>
     <DropdownToggle tag="span" data-toggle="dropdown" aria-expanded={isOpen}>
@@ -46,34 +73,6 @@ const Header = ({ teacherInfo }) => {
       </div>
     </div>
   );
-};
-
-const styles = {
-  // F5b700
-  container: {
-    height: '58px',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#6495ed'
-  },
-  logo: {
-    maxHeight: '45px',
-    marginLeft: '20px'
-  },
-  name: {
-    color: '#fff',
-    fontSize: '20px',
-    fontWeight: '600'
-  },
-  profile: {
-    display: 'flex',
-    alignItems: 'center',
-    color: '#fff',
-    fontSize: '20px',
-    marginRight: '20px'
-  }
 };
 
 Header.propTypes = {

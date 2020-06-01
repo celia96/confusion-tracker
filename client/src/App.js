@@ -47,12 +47,12 @@ const Routes = ({ socket }) => (
   <div>
     <Switch>
       {/* put all the routes here */}
-      {routes.map(({ exact, path, component: Component }) => (
+      {routes.map(({ exact, path, component: Comp }) => (
         <Route
           key={path}
           exact={exact}
           path={path}
-          render={props => <Component socket={socket} {...props} />}
+          render={props => <Comp socket={socket} {...props} />}
         />
       ))}
 
