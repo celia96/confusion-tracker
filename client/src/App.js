@@ -4,6 +4,10 @@ import NoMatch from './components/NoMatch';
 
 import StudentClassView from './components/Student/Class/StudentClassView';
 import TeacherClassView from './components/Teacher/Class/TeacherClassView';
+import MainPage from './components/Teacher/MainPage/MainPage';
+import ManageCourses from './components/Teacher/MainPage/ManageCourses/ManageCourses';
+import ManageCourseDetail from './components/Teacher/MainPage/ManageCourseDetail/ManageCourseDetail';
+import ManageAnalytics from './components/Teacher/MainPage/ManageAnalytics/ManageAnalytics';
 
 import './mysass.scss';
 
@@ -11,12 +15,31 @@ const io = require('socket.io-client');
 
 const routes = [
   {
-    path: '/student',
+    path: '/student/class/:className',
     component: StudentClassView
   },
   {
-    path: '/teacher',
+    path: '/teacher/class/:className',
     component: TeacherClassView
+  },
+  {
+    exact: true,
+    path: '/teacher',
+    component: MainPage
+  },
+  {
+    exact: true,
+    path: '/teacher/courses',
+    component: ManageCourses
+  },
+  {
+    exact: true,
+    path: '/teacher/courses/:courseName', // /teacher/courses/courseName?dateCreated=2019512
+    component: ManageCourseDetail
+  },
+  {
+    path: '/teacher/courses/:courseName/analytics',
+    component: ManageAnalytics
   }
 ];
 
@@ -24,9 +47,10 @@ const Routes = ({ socket }) => (
   <div>
     <Switch>
       {/* put all the routes here */}
-      {routes.map(({ path, component: Component }) => (
+      {routes.map(({ exact, path, component: Component }) => (
         <Route
           key={path}
+          exact={exact}
           path={path}
           render={props => <Component socket={socket} {...props} />}
         />

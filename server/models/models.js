@@ -30,75 +30,37 @@ Class
 */
 
 const classSchema = new mongoose.Schema({
-  // course:{
-  //   type: Schema.ObjectId,
-  //   ref: 'Course',
-  //   required: true
-  // },
-  // code: {
-  //   type: String,
-  //   requried: true
-  // },
-  // teacher: {
-  //   type: Schema.ObjectId,
-  //   ref: 'Teacher',
-  //   required: true
-  // },
+  course: {
+    type: Schema.ObjectId,
+    ref: 'Course'
+  },
+  teacher: {
+    type: Schema.ObjectId,
+    ref: 'Teacher'
+  },
+  courseName: {
+    type: String
+  },
+  confusionRate: {
+    type: Number,
+    required: true
+  },
   attendees: {
     type: Map,
     required: true
   },
-  confusionRate: {
-    type: Number
-    // required: true
-  },
   questions: {
-    type: Map,
-    requried: false
+    type: Map
+  },
+  dateCreated: {
+    type: Number
+  },
+  chartData: {
+    type: Array
+  },
+  isOver: {
+    type: Boolean
   }
-  // agendas: {
-  //   type: Map,
-  //   required: true
-  // },
-  // dateCreated: {
-  //   type: String,
-  //   required: true
-  // },
-  // duration: {
-  //   type: Number,
-  //   required: true
-  // },
-  // alert: {
-  //   type: Number,
-  //   required: true
-  // },
-  // confusionGraph: {
-  //   data: {
-  //     type: Array
-  //   },
-  //   lables: {
-  //     type: Array
-  //   }
-  // },
-  // isOver: {
-  //   type: Boolean,
-  //   required: true
-  // },
-  // survey: {
-  //   comments: {
-  //     type: Array
-  //   },
-  //   ratings: {
-  //     type: Map,
-  //     default: {
-  //       1: 0,
-  //       2: 0,
-  //       3: 0,
-  //       4: 0,
-  //       5: 0
-  //     }
-  //   }
-  // },
 });
 
 const courseSchema = new mongoose.Schema({
@@ -108,14 +70,27 @@ const courseSchema = new mongoose.Schema({
   },
   teacher: {
     type: Schema.ObjectId,
-    ref: 'Teacher',
-    required: true
+    ref: 'Teacher'
   },
   dateCreated: {
-    type: String,
+    type: Number,
     required: true
   },
-  classes: [{ type: Schema.Types.ObjectId, ref: 'Class' }]
+  classes: [{ type: Schema.Types.ObjectId, ref: 'Class' }],
+  students: [
+    {
+      name: {
+        type: String
+      },
+      studentId: {
+        type: String,
+        required: true
+      },
+      email: {
+        type: String
+      }
+    }
+  ]
 });
 
 const teacherSchema = new mongoose.Schema({

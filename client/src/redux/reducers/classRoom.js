@@ -2,7 +2,7 @@ import { START_CLASS, UPDATE_CLASS, END_CLASS } from '../actions';
 
 const defaultState = {
   classId: '5eb8b0de7c213e5d2fa7eb7e',
-  className: 'CS101',
+  courseName: 'CS101',
   questions: {},
   students: [
     '00669468',
@@ -13,7 +13,8 @@ const defaultState = {
     '00669404'
   ],
   confusionRate: 0,
-  chartData: []
+  chartData: [],
+  dateCreated: 1590811677563
 };
 
 const classRoom = (state = defaultState, action) => {

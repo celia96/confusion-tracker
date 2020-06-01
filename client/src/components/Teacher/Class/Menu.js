@@ -24,7 +24,7 @@ const VerticalButton = ({ toggle }) => (
 );
 
 const Menu = ({ classInfo, teacherInfo, collapse, toggle }) => {
-  const { questions, confusionRate, students, className } = classInfo;
+  const { questions, confusionRate, students, courseName } = classInfo;
   const { firstName, lastName } = teacherInfo;
   const studentsNum = Object.keys(students).length;
   const questionsNum = Object.keys(questions).length;
@@ -53,7 +53,7 @@ const Menu = ({ classInfo, teacherInfo, collapse, toggle }) => {
             {moment().format('dddd, MMMM Do YYYY')}
           </ListGroupItem>
           <ListGroupItem className="justify-content-between">
-            Class: {className}
+            Class: {courseName}
           </ListGroupItem>
           <ListGroupItem className="justify-content-between">
             Students{' '}
@@ -115,7 +115,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  null
-)(Menu);
+export default connect(mapStateToProps, null)(Menu);

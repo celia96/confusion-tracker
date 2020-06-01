@@ -22,6 +22,8 @@ class StudentClassView extends Component {
       questions: new Map(),
       text: ''
     };
+    this.join = this.join(this);
+    this.leave = this.leave(this);
     this.toggleConfusion = this.toggleConfusion.bind(this);
     this.submitQuestion = this.submitQuestion.bind(this);
     this.upvoteQuestion = this.upvoteQuestion.bind(this);
@@ -99,10 +101,10 @@ class StudentClassView extends Component {
 
   render() {
     const { questions, confused, text } = this.state;
-    const { className, studentId } = this.props;
+    const { courseName, studentId } = this.props;
     return (
       <div style={styles.container}>
-        <Header className={className} studentId={studentId} />
+        <Header courseName={courseName} studentId={studentId} />
         <div style={styles.contentContainer}>
           <div style={styles.left}>
             <div style={styles.buttonContainer}>
@@ -175,7 +177,7 @@ StudentClassView.propTypes = {
   studentId: PropTypes.string.isRequired,
   confusionState: PropTypes.bool.isRequired,
   classId: PropTypes.string.isRequired,
-  className: PropTypes.string.isRequired,
+  courseName: PropTypes.string.isRequired,
   updateMyConfusion: PropTypes.func.isRequired,
   joinClass: PropTypes.func,
   leaveClass: PropTypes.func
@@ -186,7 +188,7 @@ const mapStateToProps = state => {
     studentId: state && state.student && state.student.studentId,
     confusionState: state && state.student && state.student.confusionState,
     classId: state && state.classRoom && state.classRoom.classId,
-    className: state && state.classRoom && state.classRoom.className
+    courseName: state && state.classRoom && state.classRoom.courseName
   };
 };
 
@@ -198,7 +200,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(StudentClassView);
+export default connect(mapStateToProps, mapDispatchToProps)(StudentClassView);

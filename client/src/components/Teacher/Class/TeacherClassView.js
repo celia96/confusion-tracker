@@ -1,4 +1,3 @@
-/* eslint-disable react/prefer-stateless-function, react/no-unused-state*/
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -106,7 +105,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(TeacherClassView);
+export default connect(mapStateToProps, mapDispatchToProps)(TeacherClassView);

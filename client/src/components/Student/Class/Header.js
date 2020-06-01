@@ -4,18 +4,17 @@ import { Button } from 'reactstrap';
 
 import image from '../../../assets/image.png';
 
-const Header = ({ className, studentId }) => {
+const Header = ({ courseName, studentId }) => {
   return (
     <div style={styles.container}>
       <img src={image} style={styles.logo} alt="logo" />
-      <span style={styles.name}>{`Class ${className} - ${studentId}`}</span>
+      <span style={styles.name}>{`Class ${courseName} - ${studentId}`}</span>
       <Button style={styles.leaveButton}>Leave</Button>
     </div>
   );
 };
 
 const styles = {
-  // F5b700
   container: {
     height: '58px',
     display: 'flex',
@@ -44,7 +43,7 @@ const styles = {
 };
 
 Header.propTypes = {
-  className: PropTypes.string.isRequired,
+  courseName: PropTypes.string.isRequired,
   studentId: PropTypes.string.isRequired
 };
 
