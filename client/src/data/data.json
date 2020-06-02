@@ -23,6 +23,35 @@
       "question": "Please explain more about something2"
     }
   },
+  "students": [
+    {
+      "name": "Soobin Choi",
+      "studentId": "00669461",
+      "email": "soobin@gmail.com"
+    },
+    {
+      "name": "Jin Choi",
+      "studentId": "00669462",
+      "email": "jin@gmail.com"
+    },
+    {
+      "name": "Daniel Choi",
+      "studentId": "00669463",
+      "email": "daniel@gmail.com"
+    },
+    {
+      "name": "Chul Choi",
+      "studentId": "00669464",
+      "email": "chul@gmail.com"
+    }
+  ],
+  "chartData": [
+    [1590985201605, 4],
+    [1590985206608, 4],
+    [1590985211605, 3],
+    [1590985216602, 3],
+    [1590985222140, 4]
+  ],
   "courses": [
     {
       "id": "5eb8",

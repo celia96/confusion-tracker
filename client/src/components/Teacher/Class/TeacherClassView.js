@@ -7,7 +7,7 @@ import QuestionList from './QuestionList';
 import Menu from './Menu';
 
 import { store } from '../../../redux/store';
-import { updateClass } from '../../../redux/actions';
+import { updateClass, endClass } from '../../../redux/actions';
 
 const styles = {
   container: {
@@ -28,6 +28,7 @@ class TeacherClassView extends Component {
     };
     this.toggleMenu = this.toggleMenu.bind(this);
     this.toggleQuestions = this.toggleQuestions.bind(this);
+    this.end = this.end.bind(this);
   }
 
   componentDidMount() {
@@ -61,12 +62,22 @@ class TeacherClassView extends Component {
     });
   }
 
+  end() {
+    const { socket, classId, chartData, stopClass } = this.props;
+    socket.emit('endClass', { classId, chartData });
+    stopClass();
+  }
+
   render() {
     const { socket } = this.props;
     const { questions, collapseMenu, collapseQuestions } = this.state;
     return (
       <div style={styles.container}>
-        <Menu collapse={collapseMenu} toggle={this.toggleMenu} />
+        <Menu
+          collapse={collapseMenu}
+          toggle={this.toggleMenu}
+          endClass={this.end}
+        />
         <ConfusionGraph socket={socket} />
         <QuestionList
           questions={questions}
@@ -86,13 +97,15 @@ TeacherClassView.propTypes = {
 const mapStateToProps = state => {
   return {
     teacherInfo: state && state.teacher,
-    classId: state && state.classRoom && state.classRoom.classId
+    classId: state && state.classRoom && state.classRoom.classId,
+    chartData: state && state.classRoom && state.classRoom.chartData
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateClassInfo: confusion => dispatch(updateClass(confusion))
+    updateClassInfo: confusion => dispatch(updateClass(confusion)),
+    stopClass: () => dispatch(endClass())
   };
 };
 

@@ -46,7 +46,7 @@ const VerticalButton = ({ toggle }) => (
   </Button>
 );
 
-const Menu = ({ classInfo, teacherInfo, collapse, toggle }) => {
+const Menu = ({ classInfo, teacherInfo, collapse, toggle, endClass }) => {
   const { questions, confusionRate, students, courseName } = classInfo;
   const { firstName, lastName } = teacherInfo;
   const studentsNum = Object.keys(students).length;
@@ -94,7 +94,9 @@ const Menu = ({ classInfo, teacherInfo, collapse, toggle }) => {
             Confusion: {percentage}
           </ListGroupItem>
           <ListGroupItem>
-            <Button style={styles.endClassButton}>End Class</Button>
+            <Button onClick={endClass} style={styles.endClassButton}>
+              End Class
+            </Button>
           </ListGroupItem>
         </ListGroup>
       ) : null}

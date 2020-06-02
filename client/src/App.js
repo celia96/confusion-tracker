@@ -5,6 +5,7 @@ import NoMatch from './components/NoMatch';
 import StudentClassView from './components/Student/Class/StudentClassView';
 import TeacherClassView from './components/Teacher/Class/TeacherClassView';
 import MainPage from './components/Teacher/MainPage/MainPage';
+import ProfileSetting from './components/Teacher/MainPage/Profile/ProfileSetting';
 import ManageCourses from './components/Teacher/MainPage/ManageCourses/ManageCourses';
 import ManageCourseDetail from './components/Teacher/MainPage/ManageCourseDetail/ManageCourseDetail';
 import ManageAnalytics from './components/Teacher/MainPage/ManageAnalytics/ManageAnalytics';
@@ -26,6 +27,10 @@ const routes = [
     exact: true,
     path: '/teacher',
     component: MainPage
+  },
+  {
+    path: '/teacher/profile',
+    component: ProfileSetting
   },
   {
     exact: true,

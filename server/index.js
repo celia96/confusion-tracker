@@ -76,6 +76,24 @@ io.on('connection', async socket => {
     }
   });
 
+  socket.on('endClass', async ({ classId, chartData }) => {
+    try {
+      if (!classId || !chartData) {
+        throw new Error('missing items');
+      }
+      socket.leave(classId);
+      const classRoom = await Class.findById(classId);
+      classRoom.chartData = chartData;
+      classRoom.isOver = true;
+
+      const updatedRoom = await classRoom.save();
+      io.in(classId).emit('classRoom', updatedRoom);
+    } catch (err) {
+      console.log(err);
+      socket.emit('message', err);
+    }
+  });
+
   socket.on('classRoom', async classId => {
     try {
       if (!classId) {

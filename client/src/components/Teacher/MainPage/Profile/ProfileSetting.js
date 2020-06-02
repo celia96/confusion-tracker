@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { FaPlay } from 'react-icons/fa';
-import { MdSchool } from 'react-icons/md';
 import { GrUserSettings } from 'react-icons/gr';
+import { BsCheck } from 'react-icons/bs';
+import { FormText, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
 import Header from '../Header';
 
@@ -14,51 +14,162 @@ const styles = {
     height: '100vh',
     maxHeight: '100vh'
   },
-  subContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  messageContainer: {
-    flex: 2,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly'
-  },
-  message: {
-    width: '300px'
-  },
-  divider: {
-    height: '1px',
-    backgroundColor: 'black'
-  },
-  optionContainer: {
-    flex: 5,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'flex-start'
-  },
-  image: {
-    maxHeight: '45px',
-    marginLeft: '20px'
-  },
-  option: {
+  contentContainer: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '300px',
-    height: '200px',
-    borderRadius: '10px',
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700'
+    flex: 3
   },
-  text: {
-    fontSize: '25px',
+  formContainer: {
+    // height: '500px',
+    // width: '700px',
+    backgroundColor: '#6495ed',
+    padding: '20px',
+    borderRadius: '5px'
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '5px'
+  },
+  titleText: {
+    fontSize: '30px',
+    fontWeight: '600'
+  },
+  formText: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginRight: '5px',
+    height: '10px'
+  },
+  submitButton: {
+    width: '100%',
+    marginTop: '20px',
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
     fontWeight: '600',
-    marginTop: '15px'
+    color: '#614908'
+  },
+  label: {
+    color: '#000',
+    fontWeight: '600'
+  },
+  pointer: {
+    cursor: 'pointer',
+    color: '#fff'
   }
+};
+
+const ProfileForm = ({ teacherInfo }) => {
+  const { firstName, lastName, email } = teacherInfo;
+  const [firstNameValue, setFirstName] = useState(firstName);
+  const [lastNameValue, setlastName] = useState(lastName);
+  const [emailValue, setEmail] = useState(email);
+
+  const [isFirstNameDisabled, setFirstNameStatus] = useState(true);
+  const [isLastNameDisabled, setLastNameStatus] = useState(true);
+  const [isEmailDisabled, setEmailStatus] = useState(true);
+
+  return (
+    <Form>
+      <FormGroup>
+        <Label style={styles.label}>First Name</Label>
+        <Input
+          disabled={isFirstNameDisabled}
+          value={firstNameValue}
+          onChange={e => setFirstName(e.target.value)}
+          type="firstName"
+          name="firstName"
+          id="firstName"
+        />
+        <FormText style={styles.formText}>
+          {isFirstNameDisabled ? (
+            <span
+              style={styles.pointer}
+              onClick={() => setFirstNameStatus(false)}
+            >
+              Change
+            </span>
+          ) : (
+            <BsCheck
+              size="15"
+              onClick={() => setFirstNameStatus(true)}
+              style={styles.pointer}
+              color="#fff"
+            />
+          )}
+        </FormText>
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Last Name</Label>
+        <Input
+          disabled={isLastNameDisabled}
+          value={lastNameValue}
+          onChange={e => setlastName(e.target.value)}
+          type="lastName"
+          name="lastName"
+          id="lastName"
+        />
+        <FormText style={styles.formText}>
+          {isLastNameDisabled ? (
+            <span
+              style={styles.pointer}
+              onClick={() => setLastNameStatus(false)}
+            >
+              Change
+            </span>
+          ) : (
+            <BsCheck
+              size="15"
+              onClick={() => setLastNameStatus(true)}
+              style={styles.pointer}
+              color="#fff"
+            />
+          )}
+        </FormText>
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Email</Label>
+        <Input
+          disabled={isEmailDisabled}
+          value={emailValue}
+          onChange={e => setEmail(e.target.value)}
+          type="email"
+          name="email"
+          id="email"
+        />
+        <FormText style={styles.formText}>
+          {isEmailDisabled ? (
+            <span style={styles.pointer} onClick={() => setEmailStatus(false)}>
+              Change
+            </span>
+          ) : (
+            <BsCheck
+              size="15"
+              onClick={() => setEmailStatus(true)}
+              style={styles.pointer}
+              color="#fff"
+            />
+          )}
+        </FormText>
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Password</Label>
+        <Input
+          disabled
+          value={'******'}
+          type="password"
+          name="password"
+          id="assword"
+        />
+        <FormText style={styles.formText}>
+          <span style={styles.pointer} onClick={() => setLastNameStatus(false)}>
+            Change
+          </span>
+        </FormText>
+      </FormGroup>
+      <Button style={styles.submitButton}>Submit</Button>
+    </Form>
+  );
 };
 
 class ProfileSetting extends Component {
@@ -75,24 +186,26 @@ class ProfileSetting extends Component {
     return (
       <div style={styles.container}>
         <Header teacherInfo={teacherInfo} />
-        {/* <img src={image} style={styles.image} alt="image" />   */}
-        <div style={styles.subContainer}>
-          <div style={styles.messageContainer} />
-          {/* <div style={styles.divider}/> */}
-          <div style={styles.optionContainer}>
-            <div style={styles.option}>
-              <FaPlay size="50" />
-              <span style={styles.text}>Start Class</span>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            flex: 1
+          }}
+        >
+          <div style={{ flex: 2 }} />
+          <div style={styles.contentContainer}>
+            <div style={styles.title}>
+              <GrUserSettings size="40" />
+              <span style={{ margin: '5px' }} />
+              <span style={styles.titleText}>Profile Setting</span>
             </div>
-            <div style={styles.option}>
-              <MdSchool size="60" />
-              <span style={styles.text}>Manage Courses</span>
-            </div>
-            <div style={styles.option}>
-              <GrUserSettings size="50" />
-              <span style={styles.text}>Profile Setting</span>
+            <div style={styles.formContainer}>
+              <ProfileForm teacherInfo={teacherInfo} />
             </div>
           </div>
+          <div style={{ flex: 2 }} />
         </div>
       </div>
     );

@@ -11,6 +11,14 @@ const styles = {
   container: {
     flex: 1,
     display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '20px'
+  },
+  chartContainer: {
+    flex: 1,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
   }
@@ -45,10 +53,6 @@ class ConfusionGraph extends Component {
         markers: {
           size: 0
         },
-        title: {
-          text: 'Dynamic Updating Chart',
-          align: 'left'
-        },
         xaxis: {
           type: 'numeric',
           labels: {
@@ -60,7 +64,7 @@ class ConfusionGraph extends Component {
         yaxis: {
           min: 0,
           max: this.props.students.length,
-          tickAmount: 10,
+          tickAmount: this.props.students.length < 10 ? null : 10,
           forceNiceScale: this.props.students.length < 10 ? true : false,
           labels: {
             formatter: function(val) {
@@ -72,7 +76,7 @@ class ConfusionGraph extends Component {
       series: [
         {
           name: 'confusion',
-          data: (this.props.chartData && this.props.chartData) || []
+          data: this.props.chartData || []
         }
       ]
     };
@@ -135,9 +139,9 @@ class ConfusionGraph extends Component {
   render() {
     const { confusionRate, options, series } = this.state;
     return (
-      <div>
+      <div style={styles.container}>
         <div>Confusion: {confusionRate}</div>
-        <div id="chart" style={styles.container}>
+        <div id="chart" style={styles.chartContainer}>
           <Chart options={options} series={series} type="line" width="1000" />
         </div>
       </div>
