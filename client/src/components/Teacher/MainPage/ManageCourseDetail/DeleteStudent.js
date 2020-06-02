@@ -2,17 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Table,
-  Form,
-  FormGroup,
-  Row,
-  Col,
-  Label,
   Button,
   Modal,
   ModalHeader,
   ModalBody,
   ModalFooter
 } from 'reactstrap';
+
+const styles = {
+  modalFooter: {
+    borderTop: '0px'
+  },
+  bodyText: {
+    fontWeight: '600',
+    marginBottom: '10px'
+  },
+  confirmButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  }
+};
 
 const StudentForm = ({ studentInfo }) => {
   const { name, studentId, email } = studentInfo;
@@ -54,22 +65,6 @@ const DeleteStudent = ({ isOpen, toggle, studentInfo }) => {
       </ModalFooter>
     </Modal>
   );
-};
-
-const styles = {
-  modalFooter: {
-    borderTop: '0px'
-  },
-  bodyText: {
-    fontWeight: '600',
-    marginBottom: '10px'
-  },
-  confirmButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-  }
 };
 
 DeleteStudent.propTypes = {

@@ -6,6 +6,71 @@ import moment from 'moment';
 
 import questionIcon from '../../../assets/question.png';
 
+const styles = {
+  questionStyle: {
+    container: {
+      margin: '5px',
+      borderRadius: '5px'
+    },
+    upperContainer: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    },
+    upperSubContainer: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+    avatar: {
+      fontSize: '1.2rem',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#6495ed', //1e90ff
+      width: '2.5rem',
+      height: '2.5rem',
+      color: 'white',
+      borderRadius: '2.5rem'
+    },
+    nameTimeContainer: {
+      paddingLeft: '10px',
+      display: 'flex',
+      flexDirection: 'column'
+    },
+    name: {
+      fontSize: '1rem'
+    },
+    time: {
+      fontSize: '0.7rem'
+    },
+    badge: {
+      backgroundColor: '#6495ed',
+      cursor: 'pointer'
+    },
+    questionText: {
+      paddingTop: '10px'
+    }
+  },
+  questionListStyle: {
+    container: {
+      zIndex: 1,
+      position: 'absolute',
+      right: '0px',
+      display: 'flex',
+      flexDirection: 'row',
+      height: '100vh',
+      padding: '10px'
+    },
+    listContainer: {
+      flex: 1,
+      maxHeight: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#6495ed',
+      borderRadius: '5px'
+    }
+  }
+};
+
 const VerticalButton = ({ toggle }) => (
   <Button
     onClick={toggle}
@@ -75,71 +140,6 @@ const QuestionList = ({ collapse, questions, toggle }) => {
   );
 };
 
-const styles = {
-  questionStyle: {
-    container: {
-      margin: '5px',
-      borderRadius: '5px'
-    },
-    upperContainer: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    },
-    upperSubContainer: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    avatar: {
-      fontSize: '1.2rem',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#6495ed', //1e90ff
-      width: '2.5rem',
-      height: '2.5rem',
-      color: 'white',
-      borderRadius: '2.5rem'
-    },
-    nameTimeContainer: {
-      paddingLeft: '10px',
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    name: {
-      fontSize: '1rem'
-    },
-    time: {
-      fontSize: '0.7rem'
-    },
-    badge: {
-      backgroundColor: '#6495ed',
-      cursor: 'pointer'
-    },
-    questionText: {
-      paddingTop: '10px'
-    }
-  },
-  questionListStyle: {
-    container: {
-      zIndex: 1,
-      position: 'absolute',
-      right: '0px',
-      display: 'flex',
-      flexDirection: 'row',
-      height: '100vh',
-      padding: '10px'
-    },
-    listContainer: {
-      flex: 1,
-      maxHeight: '100vh',
-      overflow: 'auto',
-      backgroundColor: '#6495ed',
-      borderRadius: '5px'
-    }
-  }
-};
-
 QuestionList.propTypes = {
   questions: PropTypes.object.isRequired,
   collapse: PropTypes.bool,
@@ -152,7 +152,4 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  null
-)(QuestionList);
+export default connect(mapStateToProps, null)(QuestionList);

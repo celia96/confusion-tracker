@@ -3,51 +3,6 @@ import PropTypes from 'prop-types';
 import { Badge, Card, CardText } from 'reactstrap';
 import moment from 'moment';
 
-const Question = ({ question, upvoteQuestion }) => {
-  const { text, upvoters, timestamp } = question;
-  const time = moment(timestamp).format('LT');
-  // 1e90ff
-  return (
-    <Card body style={styles.container}>
-      <div style={styles.upperContainer}>
-        <div style={styles.upperSubContainer}>
-          <span style={styles.avatar}>Q</span>
-          <div style={styles.nameTimeContainer}>
-            <span style={styles.name}>Anonymous</span>
-            <span style={styles.time}>{time}</span>
-          </div>
-        </div>
-        <div>
-          <Badge
-            pill
-            style={styles.badge}
-            onClick={() => upvoteQuestion(question)}
-          >
-            +{upvoters.length}
-          </Badge>
-        </div>
-      </div>
-      <CardText style={styles.questionText}>{text}</CardText>
-    </Card>
-  );
-};
-
-const QuestionList = ({ questions, upvoteQuestion }) => {
-  const questionList = Object.values(questions);
-  // console.log('question list ', questionList);
-  return (
-    <div>
-      {questionList.map(question => (
-        <Question
-          key={question.title + question.questionId}
-          question={question}
-          upvoteQuestion={upvoteQuestion}
-        />
-      ))}
-    </div>
-  );
-};
-
 const styles = {
   container: {
     margin: '5px',
@@ -91,6 +46,51 @@ const styles = {
   questionText: {
     paddingTop: '10px'
   }
+};
+
+const Question = ({ question, upvoteQuestion }) => {
+  const { text, upvoters, timestamp } = question;
+  const time = moment(timestamp).format('LT');
+  // 1e90ff
+  return (
+    <Card body style={styles.container}>
+      <div style={styles.upperContainer}>
+        <div style={styles.upperSubContainer}>
+          <span style={styles.avatar}>Q</span>
+          <div style={styles.nameTimeContainer}>
+            <span style={styles.name}>Anonymous</span>
+            <span style={styles.time}>{time}</span>
+          </div>
+        </div>
+        <div>
+          <Badge
+            pill
+            style={styles.badge}
+            onClick={() => upvoteQuestion(question)}
+          >
+            +{upvoters.length}
+          </Badge>
+        </div>
+      </div>
+      <CardText style={styles.questionText}>{text}</CardText>
+    </Card>
+  );
+};
+
+const QuestionList = ({ questions, upvoteQuestion }) => {
+  const questionList = Object.values(questions);
+  // console.log('question list ', questionList);
+  return (
+    <div>
+      {questionList.map(question => (
+        <Question
+          key={question.title + question.questionId}
+          question={question}
+          upvoteQuestion={upvoteQuestion}
+        />
+      ))}
+    </div>
+  );
 };
 
 QuestionList.propTypes = {

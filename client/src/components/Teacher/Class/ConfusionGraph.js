@@ -7,13 +7,29 @@ import moment from 'moment';
 // import { store } from '../../../redux/store';
 import { updateClass } from '../../../redux/actions';
 
+const styles = {
+  container: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: '20px'
+  },
+  chartContainer: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+};
+
 class ConfusionGraph extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       confusionRate: 0,
-      attendees: [],
       options: {
         chart: {
           id: 'realtime',
@@ -37,10 +53,6 @@ class ConfusionGraph extends Component {
         markers: {
           size: 0
         },
-        title: {
-          text: 'Dynamic Updating Chart',
-          align: 'left'
-        },
         xaxis: {
           type: 'numeric',
           labels: {
@@ -52,7 +64,7 @@ class ConfusionGraph extends Component {
         yaxis: {
           min: 0,
           max: this.props.students.length,
-          tickAmount: 10,
+          tickAmount: this.props.students.length < 10 ? null : 10,
           forceNiceScale: this.props.students.length < 10 ? true : false,
           labels: {
             formatter: function(val) {
@@ -64,7 +76,7 @@ class ConfusionGraph extends Component {
       series: [
         {
           name: 'confusion',
-          data: (this.props.chartData && this.props.chartData) || []
+          data: this.props.chartData || []
         }
       ]
     };
@@ -112,7 +124,6 @@ class ConfusionGraph extends Component {
               data: chartData
             }
           ],
-          attendees: Object.keys(attendees),
           confusionRate
         });
 
@@ -126,23 +137,17 @@ class ConfusionGraph extends Component {
   }
 
   render() {
-    const { options, series } = this.state;
+    const { confusionRate, options, series } = this.state;
     return (
-      <div id="chart" style={styles.container}>
-        <Chart options={options} series={series} type="line" width="1000" />
+      <div style={styles.container}>
+        <div>Confusion: {confusionRate}</div>
+        <div id="chart" style={styles.chartContainer}>
+          <Chart options={options} series={series} type="line" width="1000" />
+        </div>
       </div>
     );
   }
 }
-
-const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-};
 
 ConfusionGraph.propTypes = {
   classId: PropTypes.string.isRequired,
@@ -165,7 +170,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConfusionGraph);
+export default connect(mapStateToProps, mapDispatchToProps)(ConfusionGraph);

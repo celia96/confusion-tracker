@@ -17,12 +17,12 @@ const styles = {
   }
 };
 
-const DeleteCourse = ({ isOpen, toggle, courseName }) => {
+const DeleteClass = ({ isOpen, toggle, courseName, timestamp }) => {
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>Delete {courseName}</ModalHeader>
       <ModalBody style={styles.modalBody}>
-        Are you sure you want to delete {courseName}?
+        Are you sure you want to delete {courseName} started in {timestamp}?
       </ModalBody>
       <ModalFooter style={styles.modalFooter}>
         <Button color="primary" onClick={toggle} style={styles.confirmButton}>
@@ -34,9 +34,9 @@ const DeleteCourse = ({ isOpen, toggle, courseName }) => {
   );
 };
 
-DeleteCourse.propTypes = {
+DeleteClass.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   toggle: PropTypes.func.isRequired
 };
 
-export default DeleteCourse;
+export default DeleteClass;

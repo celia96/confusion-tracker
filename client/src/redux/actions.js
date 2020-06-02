@@ -54,6 +54,6 @@ export const updateClass = classInfo => {
 
 export const endClass = () => {
   return {
-    type: START_CLASS
+    type: END_CLASS
   };
 };

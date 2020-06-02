@@ -4,16 +4,6 @@ import { Button } from 'reactstrap';
 
 import image from '../../../assets/image.png';
 
-const Header = ({ courseName, studentId }) => {
-  return (
-    <div style={styles.container}>
-      <img src={image} style={styles.logo} alt="logo" />
-      <span style={styles.name}>{`Class ${courseName} - ${studentId}`}</span>
-      <Button style={styles.leaveButton}>Leave</Button>
-    </div>
-  );
-};
-
 const styles = {
   container: {
     height: '58px',
@@ -40,6 +30,16 @@ const styles = {
     margin: '10px',
     marginRight: '20px'
   }
+};
+
+const Header = ({ courseName, studentId }) => {
+  return (
+    <div style={styles.container}>
+      <img src={image} style={styles.logo} alt="logo" />
+      <span style={styles.name}>{`Class ${courseName} - ${studentId}`}</span>
+      <Button style={styles.leaveButton}>Leave</Button>
+    </div>
+  );
 };
 
 Header.propTypes = {

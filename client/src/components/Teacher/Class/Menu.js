@@ -7,6 +7,29 @@ import moment from 'moment';
 import logo from '../../../assets/logo.png';
 import menuIcon from '../../../assets/open-menu.png';
 
+const styles = {
+  container: {
+    zIndex: 1,
+    position: 'absolute',
+    left: '0px',
+    display: 'flex',
+    flexDirection: 'row',
+    height: '100vh',
+    padding: '10px'
+  },
+  listGroupContainer: {
+    margin: '5px'
+  },
+  badge: {
+    backgroundColor: '#6495ed'
+  },
+  endClassButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    width: '100%'
+  }
+};
+
 const VerticalButton = ({ toggle }) => (
   <Button
     color="primary"
@@ -23,7 +46,7 @@ const VerticalButton = ({ toggle }) => (
   </Button>
 );
 
-const Menu = ({ classInfo, teacherInfo, collapse, toggle }) => {
+const Menu = ({ classInfo, teacherInfo, collapse, toggle, endClass }) => {
   const { questions, confusionRate, students, courseName } = classInfo;
   const { firstName, lastName } = teacherInfo;
   const studentsNum = Object.keys(students).length;
@@ -71,36 +94,15 @@ const Menu = ({ classInfo, teacherInfo, collapse, toggle }) => {
             Confusion: {percentage}
           </ListGroupItem>
           <ListGroupItem>
-            <Button style={styles.endClassButton}>End Class</Button>
+            <Button onClick={endClass} style={styles.endClassButton}>
+              End Class
+            </Button>
           </ListGroupItem>
         </ListGroup>
       ) : null}
       <VerticalButton style={{ marginBottom: '1rem' }} toggle={toggle} />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    zIndex: 1,
-    position: 'absolute',
-    left: '0px',
-    display: 'flex',
-    flexDirection: 'row',
-    height: '100vh',
-    padding: '10px'
-  },
-  listGroupContainer: {
-    margin: '5px'
-  },
-  badge: {
-    backgroundColor: '#6495ed'
-  },
-  endClassButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    width: '100%'
-  }
 };
 
 Menu.propTypes = {

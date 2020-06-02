@@ -5,6 +5,7 @@ import NoMatch from './components/NoMatch';
 import StudentClassView from './components/Student/Class/StudentClassView';
 import TeacherClassView from './components/Teacher/Class/TeacherClassView';
 import MainPage from './components/Teacher/MainPage/MainPage';
+import ProfileSetting from './components/Teacher/MainPage/Profile/ProfileSetting';
 import ManageCourses from './components/Teacher/MainPage/ManageCourses/ManageCourses';
 import ManageCourseDetail from './components/Teacher/MainPage/ManageCourseDetail/ManageCourseDetail';
 import ManageAnalytics from './components/Teacher/MainPage/ManageAnalytics/ManageAnalytics';
@@ -28,6 +29,10 @@ const routes = [
     component: MainPage
   },
   {
+    path: '/teacher/profile',
+    component: ProfileSetting
+  },
+  {
     exact: true,
     path: '/teacher/courses',
     component: ManageCourses
@@ -47,12 +52,12 @@ const Routes = ({ socket }) => (
   <div>
     <Switch>
       {/* put all the routes here */}
-      {routes.map(({ exact, path, component: Component }) => (
+      {routes.map(({ exact, path, component: Comp }) => (
         <Route
           key={path}
           exact={exact}
           path={path}
-          render={props => <Component socket={socket} {...props} />}
+          render={props => <Comp socket={socket} {...props} />}
         />
       ))}
 

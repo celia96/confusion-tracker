@@ -11,6 +11,41 @@ import AddCourse from './AddCourse';
 
 import data from '../../../../data/data.json';
 
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    maxHeight: '100vh'
+  },
+  subContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: '50px',
+    marginLeft: '70px',
+    marginRight: '70px'
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  titleText: {
+    fontSize: '30px',
+    fontWeight: '600'
+  },
+  button: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    borderRadius: '50px',
+    fontWeight: '600',
+    color: '#614908',
+    padding: '10px',
+    display: 'flex',
+    alignItems: 'center'
+  }
+};
+
 class ManageCourses extends Component {
   constructor(props) {
     super(props);
@@ -62,41 +97,6 @@ class ManageCourses extends Component {
   }
 }
 
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
-  subContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: '50px',
-    marginLeft: '70px',
-    marginRight: '70px'
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  titleText: {
-    fontSize: '30px',
-    fontWeight: '600'
-  },
-  button: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    borderRadius: '50px',
-    fontWeight: '600',
-    color: '#614908',
-    padding: '10px',
-    display: 'flex',
-    alignItems: 'center'
-  }
-};
-
 ManageCourses.propTypes = {
   teacherInfo: PropTypes.object.isRequired
 };
@@ -107,7 +107,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = () => {
   return {};
 };
 

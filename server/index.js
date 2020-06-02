@@ -1,11 +1,10 @@
-/* eslint-disable no-console: "error" */
-
+/* eslint-disable no-console */
 const mongoose = require('mongoose');
 const http = require('http');
 const { app } = require('./server');
 const models = require('./models/models');
-const { Class } = models;
 
+const { Class } = models;
 // Socket IO setup
 const server = http.createServer(app);
 const io = require('socket.io')(server);
@@ -26,16 +25,12 @@ io.on('connection', async socket => {
       if (!isOrganizer && (!studentId || !studentId.trim())) {
         throw new Error('No studentId!');
       }
+      let username;
       if (isOrganizer) {
-        socket.username = String('organizer');
+        username = 'organizer';
       } else {
-        socket.username = String(studentId);
+        username = studentId;
       }
-
-      if (socket.room) {
-        socket.leave(socket.room);
-      }
-      socket.room = classId;
 
       if (!isOrganizer) {
         // if it's a student
@@ -48,18 +43,15 @@ io.on('connection', async socket => {
         }
         const updatedRoom = await classRoom.save();
         socket.join(classId, () => {
-          io.in(socket.room).emit(
+          io.in(classId).emit(
             'message',
-            `${socket.username} has joined in ${socket.room}`
+            `${username} has joined in ${classId}`
           );
-          io.in(socket.room).emit('classRoom', updatedRoom);
+          io.in(classId).emit('classRoom', updatedRoom);
         });
       } else {
         socket.join(classId, () => {
-          socket.emit(
-            'message',
-            `${socket.username} just joined in ${socket.room}`
-          );
+          socket.emit('message', `${username} just joined in ${classId}`);
         });
       }
     } catch (err) {
@@ -73,11 +65,29 @@ io.on('connection', async socket => {
       if (!classId || !studentId) {
         throw new Error('missing ids');
       }
-      socket.leave(socket.room);
+      socket.leave(classId);
       const classRoom = await Class.findById(classId);
       classRoom.attendees.delete(classId);
       const updatedRoom = await classRoom.save();
-      io.in(socket.room).emit('classRoom', updatedRoom);
+      io.in(classId).emit('classRoom', updatedRoom);
+    } catch (err) {
+      console.log(err);
+      socket.emit('message', err);
+    }
+  });
+
+  socket.on('endClass', async ({ classId, chartData }) => {
+    try {
+      if (!classId || !chartData) {
+        throw new Error('missing items');
+      }
+      socket.leave(classId);
+      const classRoom = await Class.findById(classId);
+      classRoom.chartData = chartData;
+      classRoom.isOver = true;
+
+      const updatedRoom = await classRoom.save();
+      io.in(classId).emit('classRoom', updatedRoom);
     } catch (err) {
       console.log(err);
       socket.emit('message', err);
@@ -156,7 +166,7 @@ io.on('connection', async socket => {
 
       const updatedRoom = await classRoom.save();
       // console.log('updated ', updatedRoom);
-      io.in(socket.room).emit('classRoom', updatedRoom);
+      io.in(classId).emit('classRoom', updatedRoom);
     } catch (err) {
       console.log(err);
       socket.emit('message', err);
@@ -196,7 +206,7 @@ io.on('connection', async socket => {
 
         const updatedRoom = await classRoom.save();
         // console.log('updated ', updatedRoom);
-        io.in(socket.room).emit('classRoom', updatedRoom);
+        io.in(classId).emit('classRoom', updatedRoom);
       } catch (err) {
         console.log(err);
         socket.emit('message', err);

@@ -12,6 +12,15 @@ import {
   FormGroup
 } from 'reactstrap';
 
+const styles = {
+  saveButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  }
+};
+
 const CourseForm = () => (
   <div>
     <Form>
@@ -37,15 +46,6 @@ const AddCourse = ({ isOpen, toggle }) => {
       </ModalFooter>
     </Modal>
   );
-};
-
-const styles = {
-  saveButton: {
-    backgroundColor: '#F5b700',
-    borderColor: '#F5b700',
-    fontWeight: '600',
-    color: '#614908'
-  }
 };
 
 AddCourse.propTypes = {

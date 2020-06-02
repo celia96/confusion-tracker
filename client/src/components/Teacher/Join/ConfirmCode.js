@@ -1,4 +1,4 @@
-import { Col, Label, Card, Input, Button, CardTitle } from 'reactstrap';
+/* import { Col, Label, Card, Input, Button, CardTitle } from 'reactstrap';
 import React, { Component, useState } from 'react';
 
 export const ConfirmCode = ({ submitCode }) => {
@@ -41,3 +41,4 @@ export const ConfirmCode = ({ submitCode }) => {
     </Col>
   );
 };
+ */
