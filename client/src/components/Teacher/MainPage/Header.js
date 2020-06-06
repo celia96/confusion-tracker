@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { FaUserCircle } from 'react-icons/fa';
 import { MdArrowDropDown } from 'react-icons/md';
@@ -41,13 +42,15 @@ const styles = {
 const ProfileDropdown = ({ isOpen, toggle }) => (
   <Dropdown isOpen={isOpen} toggle={toggle}>
     <DropdownToggle tag="span" data-toggle="dropdown" aria-expanded={isOpen}>
-      <FaUserCircle size="1.5em" style={{ cursor: 'pointer' }} />
-      <MdArrowDropDown size="2em" style={{ cursor: 'pointer' }} />
+      <FaUserCircle size="1.5em" className="pointer" />
+      <MdArrowDropDown size="2em" className="pointer" />
     </DropdownToggle>
     <DropdownMenu right>
       <DropdownItem header>Signed in as Celia Choy</DropdownItem>
       <DropdownItem divider />
-      <DropdownItem>Profile Setting</DropdownItem>
+      <Link to="/profile" className="router-link">
+        <DropdownItem>Profile Setting</DropdownItem>
+      </Link>
       <DropdownItem divider />
       <DropdownItem>Sign out</DropdownItem>
     </DropdownMenu>
@@ -64,7 +67,9 @@ const Header = ({ teacherInfo }) => {
   const { firstName, lastName } = teacherInfo;
   return (
     <div style={styles.container}>
-      <img src={logo} style={styles.logo} alt="logo" />
+      <Link to="/home" className="router-link">
+        <img src={logo} style={styles.logo} alt="logo" />
+      </Link>
       <span style={styles.name}>
         {firstName} {lastName}
       </span>

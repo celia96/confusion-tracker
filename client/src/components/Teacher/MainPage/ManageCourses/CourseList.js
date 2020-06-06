@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { BsPeopleFill } from 'react-icons/bs';
 import { Table, Button, Badge } from 'reactstrap';
@@ -56,7 +57,12 @@ const CourseList = ({ courses }) => {
               </td>
               <td />
               <td style={{ textAlign: 'center', ...styles.aligned }}>
-                <Button style={styles.button}>View</Button>
+                <Link
+                  to={`/courses/${course.courseName}`}
+                  className="router-link"
+                >
+                  <Button style={styles.button}>View</Button>
+                </Link>
               </td>
             </tr>
           ))}

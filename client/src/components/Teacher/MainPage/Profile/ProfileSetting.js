@@ -20,8 +20,8 @@ const styles = {
     flex: 3
   },
   formContainer: {
-    // height: '500px',
-    // width: '700px',
+    maxWidth: '600px',
+    minWidth: '400px',
     backgroundColor: '#6495ed',
     padding: '20px',
     borderRadius: '5px'
@@ -53,8 +53,7 @@ const styles = {
     color: '#000',
     fontWeight: '600'
   },
-  pointer: {
-    cursor: 'pointer',
+  action: {
     color: '#fff'
   }
 };
@@ -84,16 +83,18 @@ const ProfileForm = ({ teacherInfo }) => {
         <FormText style={styles.formText}>
           {isFirstNameDisabled ? (
             <span
-              style={styles.pointer}
+              className="pointer"
+              style={styles.action}
               onClick={() => setFirstNameStatus(false)}
             >
               Change
             </span>
           ) : (
             <BsCheck
+              className="pointer"
               size="15"
               onClick={() => setFirstNameStatus(true)}
-              style={styles.pointer}
+              style={styles.action}
               color="#fff"
             />
           )}
@@ -112,7 +113,7 @@ const ProfileForm = ({ teacherInfo }) => {
         <FormText style={styles.formText}>
           {isLastNameDisabled ? (
             <span
-              style={styles.pointer}
+              style={styles.action}
               onClick={() => setLastNameStatus(false)}
             >
               Change
@@ -121,7 +122,7 @@ const ProfileForm = ({ teacherInfo }) => {
             <BsCheck
               size="15"
               onClick={() => setLastNameStatus(true)}
-              style={styles.pointer}
+              style={styles.action}
               color="#fff"
             />
           )}

@@ -63,9 +63,6 @@ const styles = {
   navContainer: {
     margin: '50px',
     marginTop: '30px'
-  },
-  pointer: {
-    cursor: 'pointer'
   }
 };
 
@@ -96,7 +93,8 @@ const ConfusionChart = ({ students, chartData }) => {
     yaxis: {
       min: 0,
       max: students.length,
-      tickAmount: students.length < 10 ? students.length : 10,
+      tickAmount: students.length < 10 ? null : 10,
+      forceNiceScale: students.length < 10 ? true : false,
       labels: {
         formatter: function(val) {
           return val.toFixed(0);
@@ -186,7 +184,7 @@ class ManageAnalytics extends Component {
               {courseName} : {timestamp}
             </span>
           </div>
-          <div style={styles.pointer} onClick={this.toggleDeleteClassModal}>
+          <div className="pointer" onClick={this.toggleDeleteClassModal}>
             <RiDeleteBin6Line size="40" />
           </div>
         </div>

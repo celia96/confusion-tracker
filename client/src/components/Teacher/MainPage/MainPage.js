@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { FaPlay } from 'react-icons/fa';
 import { MdSchool } from 'react-icons/md';
@@ -54,11 +55,6 @@ const styles = {
     borderRadius: '10px',
     backgroundColor: '#F5b700',
     borderColor: '#F5b700'
-  },
-  text: {
-    fontSize: '25px',
-    fontWeight: '600',
-    marginTop: '15px'
   }
 };
 
@@ -69,18 +65,25 @@ const MainPage = ({ teacherInfo }) => {
       <div style={styles.subContainer}>
         <div style={styles.messageContainer} />
         <div style={styles.optionContainer}>
-          <div style={styles.option}>
-            <FaPlay size="50" />
-            <span style={styles.text}>Start Class</span>
-          </div>
-          <div style={styles.option}>
-            <MdSchool size="60" />
-            <span style={styles.text}>Manage Courses</span>
-          </div>
-          <div style={styles.option}>
-            <GrUserSettings size="50" />
-            <span style={styles.text}>Profile Setting</span>
-          </div>
+          <Link to="/home" className="router-link">
+            <div style={styles.option}>
+              {/* opens a Modal that creates a class */}
+              <FaPlay color="#000" size="50" />
+              <span className="link-option">Start Class</span>
+            </div>
+          </Link>
+          <Link to="/courses" className="router-link">
+            <div style={styles.option}>
+              <MdSchool color="#000" size="60" />
+              <span className="link-option">Manage Courses</span>
+            </div>
+          </Link>
+          <Link to="/profile" className="router-link">
+            <div style={styles.option}>
+              <GrUserSettings color="#000" size="50" />
+              <span className="link-option">Profile Setting</span>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
