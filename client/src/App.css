@@ -1,0 +1,24 @@
+.router-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.router-link:hover {
+  color: #614908;
+  text-decoration: none;
+}
+
+.link-option {
+  font-size: 25px;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.link-option:hover {
+  color: #614908;
+  text-decoration: none;
+}
+
+.pointer {
+  cursor: pointer;
+}

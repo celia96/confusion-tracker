@@ -47,9 +47,6 @@ const styles = {
     color: '#614908',
     display: 'flex',
     alignItems: 'center'
-  },
-  pointer: {
-    cursor: 'pointer'
   }
 };
 
@@ -105,7 +102,7 @@ const StudentList = ({
                       toggleEditStudent();
                     }}
                   >
-                    <TiEdit style={styles.pointer} size="23" />
+                    <TiEdit className="pointer" size="23" />
                   </td>
                   <td
                     onClick={() => {
@@ -113,7 +110,7 @@ const StudentList = ({
                       toggleDeleteStudent();
                     }}
                   >
-                    <RiDeleteBin6Line style={styles.pointer} size="20" />
+                    <RiDeleteBin6Line className="pointer" size="20" />
                   </td>
                 </tr>
               );

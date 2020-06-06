@@ -69,9 +69,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end'
-  },
-  pointer: {
-    cursor: 'pointer'
   }
 };
 
@@ -82,7 +79,7 @@ class ManageCourseDetail extends Component {
       classes: [],
       students: [],
       courseName: '',
-      activeTab: '2',
+      activeTab: '1',
       openAddStudent: false,
       openEditStudent: false,
       openEditCourse: false,
@@ -189,8 +186,8 @@ class ManageCourseDetail extends Component {
             <span style={styles.titleText}>{courseName}</span>
             <span style={{ margin: '10px' }} />
             <MdEdit
+              className="pointer"
               onClick={this.toggleEditCourseModal}
-              style={styles.pointer}
               size="25"
             />
           </div>
@@ -202,7 +199,7 @@ class ManageCourseDetail extends Component {
         </div>
         <div style={styles.navContainer}>
           <Nav tabs>
-            <NavItem style={styles.pointer}>
+            <NavItem className="pointer">
               <NavLink
                 className={activeTab === '1' ? 'active' : ''}
                 onClick={() => this.toggleTab('1')}
@@ -214,7 +211,7 @@ class ManageCourseDetail extends Component {
                 </div>
               </NavLink>
             </NavItem>
-            <NavItem style={styles.pointer}>
+            <NavItem className="pointer">
               <NavLink
                 className={activeTab === '2' ? 'active' : ''}
                 onClick={() => this.toggleTab('2')}
@@ -228,7 +225,7 @@ class ManageCourseDetail extends Component {
             </NavItem>
             <div style={styles.delete}>
               <div onClick={this.toggleDeleteCourseModal}>
-                <RiDeleteBin6Line style={styles.pointer} size="25" />
+                <RiDeleteBin6Line className="pointer" size="25" />
               </div>
             </div>
           </Nav>
@@ -236,7 +233,7 @@ class ManageCourseDetail extends Component {
             <TabPane tabId="1">
               <Row>
                 <Col sm="12">
-                  <ClassList classes={classes} />
+                  <ClassList classes={classes} courseName={courseName} />
                 </Col>
               </Row>
             </TabPane>

@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { HashRouter, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  HashRouter,
+  Route,
+  Switch
+} from 'react-router-dom';
 import NoMatch from './components/NoMatch';
 
 import StudentClassView from './components/Student/Class/StudentClassView';
@@ -10,6 +15,7 @@ import ManageCourses from './components/Teacher/MainPage/ManageCourses/ManageCou
 import ManageCourseDetail from './components/Teacher/MainPage/ManageCourseDetail/ManageCourseDetail';
 import ManageAnalytics from './components/Teacher/MainPage/ManageAnalytics/ManageAnalytics';
 
+import './App.css';
 import './mysass.scss';
 
 const io = require('socket.io-client');
@@ -25,25 +31,25 @@ const routes = [
   },
   {
     exact: true,
-    path: '/teacher',
+    path: '/home',
     component: MainPage
   },
   {
-    path: '/teacher/profile',
+    path: '/profile',
     component: ProfileSetting
   },
   {
     exact: true,
-    path: '/teacher/courses',
+    path: '/courses',
     component: ManageCourses
   },
   {
     exact: true,
-    path: '/teacher/courses/:courseName', // /teacher/courses/courseName?dateCreated=2019512
+    path: '/courses/:courseName', // /teacher/courses/courseName?dateCreated=2019512
     component: ManageCourseDetail
   },
   {
-    path: '/teacher/courses/:courseName/analytics',
+    path: '/courses/:courseName/analytics',
     component: ManageAnalytics
   }
 ];
@@ -87,9 +93,9 @@ class App extends Component {
 
   render() {
     return (
-      <HashRouter>
+      <Router>
         <Routes socket={this.state.socket} />
-      </HashRouter>
+      </Router>
     );
   }
 }

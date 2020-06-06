@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { FaChalkboardTeacher } from 'react-icons/fa';
 import { BsPeopleFill } from 'react-icons/bs';
@@ -51,7 +52,7 @@ const styles = {
   }
 };
 
-const ClassList = ({ classes }) => {
+const ClassList = ({ classes, courseName }) => {
   return (
     <div style={styles.container}>
       <div style={styles.subContainer}>
@@ -87,7 +88,12 @@ const ClassList = ({ classes }) => {
                   <Badge style={styles.badge}>25</Badge>
                 </td>
                 <td style={{ textAlign: 'center', ...styles.aligned }}>
-                  <Button style={styles.button}>View</Button>
+                  <Link
+                    to={`/courses/${courseName}/analytics`}
+                    className="router-link"
+                  >
+                    <Button style={styles.button}>View</Button>
+                  </Link>
                 </td>
               </tr>
             ))}
