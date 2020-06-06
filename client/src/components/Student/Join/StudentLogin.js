@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+/* import React, { Component } from 'react';
 import {
   Container,
   Col,
@@ -107,3 +107,4 @@ class StudentLogin extends Component {
 }
 
 export default StudentLogin;
+ */

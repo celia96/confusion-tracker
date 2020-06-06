@@ -28,12 +28,6 @@ import DeleteStudent from './DeleteStudent';
 import DeleteCourse from './DeleteCourse';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
   subContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -177,7 +171,7 @@ class ManageCourseDetail extends Component {
     const { teacherInfo } = this.props;
 
     return (
-      <div style={styles.container}>
+      <div className="custom-container">
         <Header teacherInfo={teacherInfo} />
         <div style={styles.subContainer}>
           <div style={styles.title}>

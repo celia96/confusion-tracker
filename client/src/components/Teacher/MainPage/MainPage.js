@@ -13,7 +13,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     height: '100vh',
-    maxHeight: '100vh'
+    minWidth: '500px'
   },
   subContainer: {
     flex: 1,
@@ -52,6 +52,7 @@ const styles = {
     alignItems: 'center',
     width: '300px',
     height: '200px',
+    margin: '10px',
     borderRadius: '10px',
     backgroundColor: '#F5b700',
     borderColor: '#F5b700'
@@ -60,7 +61,7 @@ const styles = {
 
 const MainPage = ({ teacherInfo }) => {
   return (
-    <div style={styles.container}>
+    <div className="custom-container">
       <Header teacherInfo={teacherInfo} />
       <div style={styles.subContainer}>
         <div style={styles.messageContainer} />

@@ -15,12 +15,6 @@ import {
 import { store } from '../../../redux/store';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
   contentContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -143,7 +137,7 @@ class StudentClassView extends Component {
     const { questions, confused, text } = this.state;
     const { courseName, studentId } = this.props;
     return (
-      <div style={styles.container}>
+      <div className="custom-container">
         <Header courseName={courseName} studentId={studentId} />
         <div style={styles.contentContainer}>
           <div style={styles.left}>
