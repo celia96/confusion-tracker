@@ -32,6 +32,9 @@ https://confusion-tracker.herokuapp.com/
 - Header (profile setting)
 <img width="265" alt="Screen Shot 2020-05-31 at 7 35 16 PM" src="https://user-images.githubusercontent.com/33583168/83371508-72c26680-a377-11ea-9f24-82dbd106591f.png">
 
+- Profile Setting
+<img width="1437" alt="Screen Shot 2020-06-01 at 10 17 18 PM" src="https://user-images.githubusercontent.com/33583168/83940083-ccbb9580-a796-11ea-9825-9676569635a9.png">
+
 - Course list
 <img width="1440" alt="Screen Shot 2020-05-31 at 7 31 39 PM" src="https://user-images.githubusercontent.com/33583168/83371485-6b9b5880-a377-11ea-9bc1-ab4c30f88ded.png">
 <img width="1440" alt="Screen Shot 2020-05-31 at 7 31 50 PM" src="https://user-images.githubusercontent.com/33583168/83371489-6d651c00-a377-11ea-955a-da080aea056d.png">
@@ -48,3 +51,6 @@ https://confusion-tracker.herokuapp.com/
 <img width="1440" alt="Screen Shot 2020-05-31 at 7 34 31 PM" src="https://user-images.githubusercontent.com/33583168/83371504-7229d000-a377-11ea-91c8-da69756dd5a0.png">
 <img width="1440" alt="Screen Shot 2020-05-31 at 7 34 44 PM" src="https://user-images.githubusercontent.com/33583168/83371507-7229d000-a377-11ea-919b-9740ecf0f878.png">
 
+- Manage Analytics
+<img width="1440" alt="Screen Shot 2020-06-01 at 10 18 17 PM" src="https://user-images.githubusercontent.com/33583168/83940081-c62d1e00-a796-11ea-99ec-88e6f464437a.png">
+<img width="1440" alt="Screen Shot 2020-06-01 at 10 18 26 PM" src="https://user-images.githubusercontent.com/33583168/83940082-c88f7800-a796-11ea-9503-2228dda15ea8.png">
