@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
-import {
-  BrowserRouter as Router,
-  HashRouter,
-  Route,
-  Switch
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import NoMatch from './components/NoMatch';
 
 import StudentClassView from './components/Student/Class/StudentClassView';

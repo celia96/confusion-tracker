@@ -8,12 +8,6 @@ import { FormText, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import Header from '../Header';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
   contentContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -185,7 +179,7 @@ class ProfileSetting extends Component {
     const { teacherInfo } = this.props;
 
     return (
-      <div style={styles.container}>
+      <div className="custom-container">
         <Header teacherInfo={teacherInfo} />
         <div
           style={{

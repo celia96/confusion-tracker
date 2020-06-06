@@ -81,7 +81,7 @@ const ClassList = ({ classes, courseName }) => {
                 <th scope="row" style={styles.aligned}>
                   {index + 1}
                 </th>
-                <td style={styles.aligned}>2020/5/12</td>
+                <td style={styles.aligned}>2020/6/5</td>
                 <td />
                 <td style={{ textAlign: 'center', ...styles.aligned }}>
                   <BsPeopleFill size="20" />
@@ -89,7 +89,9 @@ const ClassList = ({ classes, courseName }) => {
                 </td>
                 <td style={{ textAlign: 'center', ...styles.aligned }}>
                   <Link
-                    to={`/courses/${courseName}/analytics`}
+                    to={`/courses/${courseName}/analytics?data=${new Date(
+                      1591473478258
+                    ).toISOString()}`}
                     className="router-link"
                   >
                     <Button style={styles.button}>View</Button>

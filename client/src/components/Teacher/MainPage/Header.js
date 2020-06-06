@@ -15,6 +15,7 @@ import logo from '../../../assets/image.png';
 const styles = {
   container: {
     height: '58px',
+    minHeight: '58px',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',

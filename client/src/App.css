@@ -1,3 +1,10 @@
+.custom-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 500px;
+}
+
 .router-link {
   color: inherit;
   text-decoration: none;

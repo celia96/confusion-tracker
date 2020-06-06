@@ -14,12 +14,6 @@ import DeleteClass from './DeleteClass';
 import data from '../../../../data/data.json';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    maxHeight: '100vh'
-  },
   subHeaderContainer: {
     display: 'flex',
     flexDirection: 'row',
@@ -147,7 +141,7 @@ class ManageAnalytics extends Component {
     // fetch
     const { dateCreated, courseName, chartData, students } = data;
     const timestamp = moment(dateCreated).format('YYYY/MM/DD');
-
+    console.log('props ', this.props);
     this.setState({
       courseName,
       timestamp,
@@ -174,7 +168,7 @@ class ManageAnalytics extends Component {
     const { teacherInfo } = this.props;
 
     return (
-      <div style={styles.container}>
+      <div className="custom-container">
         <Header teacherInfo={teacherInfo} />
         <div style={styles.subHeaderContainer}>
           <div style={styles.title}>
