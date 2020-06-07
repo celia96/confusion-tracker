@@ -5,7 +5,7 @@ import Chart from 'react-apexcharts';
 import moment from 'moment';
 import { IoMdAnalytics } from 'react-icons/io';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { GoGraph } from 'react-icons/go';
+// import { GoGraph } from 'react-icons/go';
 import { BsGraphUp } from 'react-icons/bs';
 
 import Header from '../Header';
