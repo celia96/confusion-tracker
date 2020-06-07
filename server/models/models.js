@@ -15,6 +15,7 @@ Course
 - Teacher: { type: Schema.ObjectId, ref: 'Teacher' }
 - dateCreated: Date
 - Classes: [classSchema]
+- Students: Array
 
 Class
 - course name: 

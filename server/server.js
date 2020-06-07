@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
+/* eslint func-names: ["error", "never"] */
+
 const express = require('express');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 
 const session = require('express-session');
@@ -25,14 +26,6 @@ if (process.env.MONGODB_URI) {
 const models = require('./models/models');
 
 const { Class, Course, Teacher } = models;
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASS
-  }
-});
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -73,7 +66,10 @@ passport.deserializeUser((id, done) => {
 
 passport.use(
   new LocalStrategy(
-    { usernameField: 'email', passwordField: 'password' },
+    {
+      usernameField: 'email',
+      passwordField: 'password'
+    },
     (email, password, done) => {
       // Find the user with the given username
       Teacher.findOne({ email }, function(err, user) {
@@ -106,13 +102,14 @@ passport.use(
   })
 );
 
+/* In Class */
 /*
-As a student and a teacher, I would like to have today’s agenda, set by the instructor, displayed in my screen.
+As a student and a teacher, I would like to see the current status/info of the class
 - GET: api/class/:classId
-    - send: class id
-    - receive: all the info about the class
+    - receive: class id
+    - response: all the info about the class
 */
-// used
+// USED & CONFIRMED
 app.get('/api/class/:classId', async (request, response) => {
   const { classId } = request.params;
   if (!classId) {
@@ -120,335 +117,196 @@ app.get('/api/class/:classId', async (request, response) => {
   }
   try {
     const classRoom = await Class.findById(classId);
-    // const classRoom = await Class.findOne({ classId });
-    if (!classRoom) return response.sendStatus(400);
+    if (!classRoom) {
+      return response.sendStatus(400);
+    }
     return response.json(classRoom);
   } catch (err) {
     return response.sendStatus(500);
   }
 });
 
-// Student
-/* 
-As a student, I would like to join the class when the class starts by its room ID and enter the room code and my student ID to join the room
-- POST: api/student/join
-    - send: class code
-    - receive: true or false
-- POST: api/student/login
-    - send: class code, student id
+/* Manage Course */
+/*
+As a teacher, I would like to see the list of courses I created sorted by their dates
+- GET: api/courses
+    - receive: teacher id
+    - response: list of courses
 */
-app.post('/api/student/join', async (request, response) => {
-  const { classCode } = request.body;
-  if (!classCode) {
+// CONFIRMED
+app.get('/api/courses/:teacherId', async (request, response) => {
+  const { teacherId } = request.params;
+  if (!teacherId) {
     return response.sendStatus(400);
   }
   try {
-    const room = await Class.findOne({ code: classCode });
-    if (!room || room.isOver) {
+    const teacher = await Teacher.findById(teacherId).populate('courses');
+    const courses = teacher && teacher.courses;
+    if (!teacher || !courses) {
       return response.sendStatus(400);
     }
-    response.json({ class: room });
+    // sort courses by date
+    const sortedCourses = courses.sort(
+      (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
+    );
+    return response.json(sortedCourses);
   } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
-  }
-});
-
-app.post('/api/student/login', async (request, response) => {
-  const { classCode, studentId } = request.body;
-  if (!classCode || !studentId) {
-    return response.sendStatus(400);
-  }
-  try {
-    const room = await Class.findOne({ code: classCode });
-    if (!room || room.attendees.has(studentId)) {
-      return response.sendStatus(400);
-    }
-    room.students.set(studentId, false);
-    const updatedRoom = await room.save();
-    response.json({ class: updatedRoom });
-  } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
+    return response.sendStatus(500);
   }
 });
 
 /*
-    As a student, I would like to rate the class difficulty and make comments after the class ends
-- POST: api/class/:classId/survey
-    - send: ratings, comments
+As a teacher, I would like to create a new course
+- POST: api/course
+    - receive: teacherId, course name
+    - response: course
 */
-app.post('/api/class/:classId/survey', async (request, response) => {
-  const { classId } = request.params;
-  const { rating, comment } = request.body;
-  if (!classId || !rating || !comment) {
+// CONFIRMED
+app.post('/api/course', async (request, response) => {
+  const { teacherId, courseName } = request.body;
+  if (!teacherId || !courseName) {
     return response.sendStatus(400);
   }
   try {
-    const room = await Class.findById(classId);
-    if (!room) {
-      return response.sendStatus(400);
-    }
-    const { ratings, comments } = room.survey;
-    ratings.set(rating, ratings.get(rating) + 1);
-    comments.push(comment);
-    await room.save();
-    response.sendStatus(200);
-  } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
-  }
-});
-
-// Teacher
-/*
-As a teacher, I would like create an account with an email and receive a verification code to set the first name, last name, and password of the created account.
-- POST: api/teacher/register
-    - send: email, first name, last name, password
-    - POST: api/send/code
-        - send: email
-    - POST: api/send/code
-        - send: code
-        - receive: true or false
-- POST: api/teacher/login
-    - send: email, first name, last name, password
-*/
-app.post('/api/teacher/register', async (request, response) => {
-  const { email, firstName, lastName, password } = request.body;
-  // if email or password does not exist
-  if (!email || !password || !firstName || !lastName || password) {
-    return response.sendStatus(400);
-  }
-  const teacher = new Teacher({
-    email,
-    firstName,
-    lastName,
-    password,
-    courses: []
-  });
-  try {
-    await teacher.save();
-    response.sendStatus(200);
-  } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
-  }
-});
-
-app.post('/api/send/code', async (request, response) => {
-  const { email } = request.body;
-
-  // if email or password does not exist
-  if (!email) {
-    return response.sendStatus(400);
-  }
-  // Create a random code
-  const emailConfirmCode = Math.floor(Math.random() * 100 + 54);
-  // save the code to database
-  console.log('email confirmation code ', emailConfirmCode);
-  // Send it to the given email
-  const mailOptions = {
-    from: process.env.EMAIL,
-    to: email,
-    subject: 'Verifcation code for your email account',
-    text: `Hello, please use the following code to verify your email: ${emailConfirmCode}`
-  };
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-      response.sendStatus(500);
-    } else {
-      response.sendStatus(200);
-    }
-  });
-});
-
-app.post('/api/verify/code', async (request, response) => {
-  const { code } = request.body;
-
-  // if code is not given
-  if (!code) {
-    return response.sendStatus(400);
-  }
-  try {
-    // compare the code in database
-    if (code !== '') {
-      console.log('wrong verification code');
-      response.sendStatus(400);
-    } else {
-      response.sendStatus(200);
-    }
-  } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
-  }
-});
-app.post(
-  'api/teacher/login',
-  passport.authenticate('local'),
-  (request, response) => {
-    if (request.user) {
-      response.json({ teacher: request.user });
-    } else {
-      return response.sendStatus(400);
-    }
-  }
-);
-
-/*
-As a teacher, I would like to see the list of courses I made and be able to create a new course (but if the name of the class already exists, I cannot add a class).
-- GET: api/teacher/me
-    - send: request.user
-    - receive: teacher’s profile
-- POST: api/teacher/create/course
-    - send: request.user, course name
-*/
-app.get('/api/teacher/me', (request, response) => {
-  if (request.user) {
-    response.json({
-      success: true,
-      teacher: request.user
+    const course = new Course({
+      courseName,
+      teacher: teacherId,
+      dateCreated: Date.now(),
+      classes: [],
+      students: []
     });
-  } else {
-    response.sendStatus(400);
-  }
-});
-
-app.post('/api/teacher/create/course', async (request, response) => {
-  const { teacher, courseName } = request.body;
-  if (!teacher || !courseName) {
-    return response.sendStatus(400);
-  }
-  const course = new Course({
-    courseName,
-    teacher: teacher._id,
-    dateCreated: Date.now(),
-    classes: []
-  });
-  try {
     const newCourse = await course.save();
-    response.json({ course: newCourse });
+    if (!newCourse) {
+      return response.sendStatus(400);
+    }
+    return response.json(newCourse);
   } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
+    return response.sendStatus(500);
   }
 });
 
+/* Manage Course Detail */
 /*
-As a teacher, I would like to see the list of classes I created for each course sorted by their dates added in a descending order.
-- GET: api/teacher/course/:courseName
-    - send: course id
-    - receive: list of classes
+As a teacher, I would like to see the list of classes and students of a given course.
+- GET: api/course/:courseId
+    - receive: course id
+    - response: course info
 */
-app.post('/api/teacher/course/:courseId', async (request, response) => {
-  const { courseId } = request.body;
+// CONFIRMED
+app.get('/api/course/:courseId', async (request, response) => {
+  const { courseId } = request.params;
   if (!courseId) {
     return response.sendStatus(400);
   }
-
   try {
-    const classes = await Course.findById(courseId).populate('classes');
-    response.json({ classes });
+    const course = await Course.findById(courseId)
+      .populate({
+        path: 'classes',
+        select: '_id dateCreated attendees'
+      })
+      .populate('students');
+    if (!course) {
+      return response.sendStatus(400);
+    }
+    return response.json(course);
   } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
+    return response.sendStatus(500);
   }
 });
 
 /*
-As a teacher, I would like to delete a class of a certain course
-- DELETE: api/teacher/course/:courseId
+As a teacher, I would like to update info of a given course.
+- PUT: api/course/:courseId
+    - receive: course id, courseName
+    - response: course info
 */
-app.delete('/api/teacher/course/:courseId', async (request, response) => {
-  const { courseId } = request.body;
-  if (!courseId) {
-    return response.sendStatus(400);
-  }
-
-  try {
-    await Course.findByIdAndDelete(courseId);
-    response.sendStatus(200);
-  } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
-  }
-});
-
-/*
-As a teacher, I would like to add a new class for a certain course and set the duration, alert rate, and the agendas. When adding a new class, I would be informed a class code (courseName + date + time i.e. CSCI312-20191029-1230)
-- POST: api/teacher/startClass
-    - send: course name, duration, alert rate, and the agendas
-*/
-app.post('/api/teacher/start/class', async (request, response) => {
-  const { teacher, course, duration, alert, agendas } = request.body;
-  if (!teacher || !course || !duration || !alertRate || !agendas) {
-    return response.sendStatus(400);
-  }
-
-  const { courseId, courseName } = course;
-  const { teacherId } = teacher;
+// CONFIRMED
+app.put('/api/course/:courseId', async (request, response) => {
+  const { courseId } = request.params;
+  const { courseName } = request.body;
   if (!courseId || !courseName) {
     return response.sendStatus(400);
   }
   try {
-    const code = 'CSCI302-2019-10-19-12-30';
-    const dateCreated = '2019-10-19-12-30';
-    const newClass = new Class({
-      course: courseId,
-      code,
-      teacher: teacherId,
-      attendees: new Map(),
-      agendas: new Map(),
-      dateCreated,
-      duration,
-      alert,
-      confusionGraph: { data: [], labels: [] },
-      isOver: false
-    });
-    await newClass.save();
-    response.json({ class: newClass });
+    await Course.findByIdAndUpdate(courseId, { courseName });
+    return response.json({ courseName });
   } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
+    return response.sendStatus(500);
   }
 });
 
 /*
-As a teacher, I would like to see the confusion state of the students in class that can be displayed in a graph or in a percentage in real time, a removable class code dialog box, class agendas, list of questions according to their agenda 
-- GET: api/class/:classId (already there)
-    - send: class Id
-    - receive: confusion state of the students, agendas, questions
+As a teacher, I would like to delete a course
+- DELETE: api/course
+    - receive: course id
+    - response: ok
 */
+// CONFIRMED
+app.delete('/api/course/:courseId', async (request, response) => {
+  const { courseId } = request.params;
+  if (!courseId) {
+    return response.sendStatus(400);
+  }
+  try {
+    await Course.findByIdAndDelete(courseId);
+    return response.sendStatus(200);
+  } catch (err) {
+    return response.sendStatus(500);
+  }
+});
 
 /*
-As a teacher, I would like to end the class and let the students do survey for the class
-- POST: api/class/:classId/end
-    - send: class Id
-    - receive: success or not
+As a teacher, I would like to add a student to a given course.
+- POST: api/course/students/:courseId
+    - receive: course id, name, student id, email
+    - response: updated course info
 */
-app.post('/api/class/:classId/end', async (request, response) => {
-  const { classId } = request.body;
+// NEED TEST & NOT SURE IF THIS IS NEEDED (TBD)
+app.post('/api/course/students/:courseId', async (request, response) => {
+  const { courseId } = request.params;
+  const { name, studentId, email } = request.body;
+  if (!studentId) {
+    return response.sendStatus(400);
+  }
+  try {
+    const course = await Course.findById(courseId);
+    const students = course && course.students;
+    if (!course || !students) {
+      return response.sendStatus(400);
+    }
+    students.push({
+      name,
+      studentId,
+      email
+    });
+    course.students = students;
+    const updatedCourse = await course.save();
+    return response.json(updatedCourse);
+  } catch (err) {
+    return response.sendStatus(500);
+  }
+});
+
+/* Manage Class Analytics */
+/*
+As a teacher, I would like to see the data/info of the class of the given date
+- GET: api/course/:courseId/:classId
+    - receive: course id, class id
+    - response: class data/info
+*/
+// NEED TEST
+app.delete('/api/class/:classId', async (request, response) => {
+  const { classId } = request.params;
   if (!classId) {
     return response.sendStatus(400);
   }
-
   try {
-    await Class.findById(classId, {
-      $set: { isOver: true }
-    });
-    response.sendStatus(200);
+    await Class.findByIdAndDelete(classId);
+    return response.sendStatus(200);
   } catch (err) {
-    console.log(err);
-    response.sendStatus(500);
+    return response.sendStatus(500);
   }
 });
-
-/*
-As a teacher, I would like to see the report for each class that contains the agenda, confusion graph, questions uploaded, ratings, and comments.
-- GET: api/class/:classId (already there)
-    - send: class id
-    - receive: confusion state of the students, agendas, questions
-*/
 
 module.exports = {
   app
