@@ -9,7 +9,7 @@ import Header from '../Header';
 import CourseList from './CourseList';
 import AddCourse from './AddCourse';
 
-import data from '../../../../data/data.json';
+// import data from '../../../../data/data.json';
 
 const styles = {
   subContainer: {
@@ -48,14 +48,24 @@ class ManageCourses extends Component {
       isOpen: false
     };
     this.toggleAddCourseModal = this.toggleAddCourseModal.bind(this);
+    this.addCourse = this.addCourse.bind(this);
   }
 
   componentDidMount() {
     // fetch
-    const { courses } = data;
-    this.setState({
-      courses
-    });
+    const { teacherId } = this.props;
+    fetch(`/api/courses/${teacherId}`)
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(courses => {
+        console.log('courses ', courses);
+        this.setState({
+          courses
+        });
+      })
+      .catch(err => console.log(err));
   }
 
   toggleAddCourseModal() {
@@ -65,13 +75,40 @@ class ManageCourses extends Component {
     });
   }
 
+  addCourse(courseName) {
+    console.log('adding course ', courseName);
+    const { teacherId } = this.props;
+    const body = JSON.stringify({
+      teacherId,
+      courseName
+    });
+    console.log('bodty ', body);
+    fetch('/api/course', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(newCourse => {
+        const courses = [newCourse, ...this.state.courses];
+        this.setState({
+          courses
+        });
+      })
+      .catch(err => console.log(err));
+  }
+
   render() {
     const { courses, isOpen } = this.state;
-    const { teacherInfo } = this.props;
 
     return (
       <div className="custom-container">
-        <Header teacherInfo={teacherInfo} />
+        <Header />
         <div style={styles.subContainer}>
           <div style={styles.title}>
             <MdSchool size="40" />
@@ -85,24 +122,24 @@ class ManageCourses extends Component {
           </Button>
         </div>
         <CourseList courses={courses} />
-        <AddCourse isOpen={isOpen} toggle={this.toggleAddCourseModal} />
+        <AddCourse
+          isOpen={isOpen}
+          addCourse={this.addCourse}
+          toggle={this.toggleAddCourseModal}
+        />
       </div>
     );
   }
 }
 
 ManageCourses.propTypes = {
-  teacherInfo: PropTypes.object.isRequired
+  teacherId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => {
   return {
-    teacherInfo: state && state.teacher
+    teacherId: state && state.teacher.teacherId
   };
 };
 
-const mapDispatchToProps = () => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ManageCourses);
+export default connect(mapStateToProps, null)(ManageCourses);

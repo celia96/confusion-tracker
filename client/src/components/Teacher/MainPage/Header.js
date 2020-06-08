@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { FaUserCircle } from 'react-icons/fa';
@@ -85,4 +86,10 @@ Header.propTypes = {
   teacherInfo: PropTypes.object.isRequired
 };
 
-export default Header;
+const mapStateToProps = state => {
+  return {
+    teacherInfo: state && state.teacher
+  };
+};
+
+export default connect(mapStateToProps, null)(Header);

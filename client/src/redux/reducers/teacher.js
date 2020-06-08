@@ -1,7 +1,7 @@
 import { LOG_IN } from '../actions';
 
 const defaultState = {
-  teacherId: '',
+  teacherId: '5edd3638e7179a6b6368147d',
   email: 'celiachoy96@gmail.com',
   firstName: 'Celia',
   lastName: 'Choy'

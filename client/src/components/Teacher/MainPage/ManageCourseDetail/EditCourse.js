@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   Button,
@@ -21,7 +21,7 @@ const styles = {
   }
 };
 
-const CourseForm = ({ courseName }) => {
+const CourseForm = ({ courseNameRef, courseName }) => {
   const [nameValue, setName] = useState(courseName);
   return (
     <div>
@@ -29,7 +29,11 @@ const CourseForm = ({ courseName }) => {
         <FormGroup>
           <Label for="course">Course name</Label>
           <Input
-            onChange={e => setName(e.target.value)}
+            innerRef={courseNameRef}
+            onChange={e => {
+              setName(e.target.value);
+              courseNameRef.current.value = e.target.value;
+            }}
             value={nameValue}
             type="text"
             name="course"
@@ -41,15 +45,23 @@ const CourseForm = ({ courseName }) => {
   );
 };
 
-const EditCourse = ({ isOpen, toggle, courseName }) => {
+const EditCourse = ({ isOpen, editCourse, toggle, courseName }) => {
+  const courseNameRef = useRef({ value: courseName });
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>Change Course Name</ModalHeader>
       <ModalBody>
-        <CourseForm courseName={courseName} />
+        <CourseForm courseNameRef={courseNameRef} courseName={courseName} />
       </ModalBody>
       <ModalFooter>
-        <Button color="primary" onClick={toggle} style={styles.saveButton}>
+        <Button
+          color="primary"
+          onClick={() => {
+            editCourse(courseNameRef.current.value);
+            toggle();
+          }}
+          style={styles.saveButton}
+        >
           Save
         </Button>{' '}
       </ModalFooter>

@@ -20,7 +20,6 @@ import Header from '../Header';
 import ClassList from './ClassList';
 import StudentList from './StudentList';
 
-import data from '../../../../data/data.json';
 import AddStudent from './AddStudent';
 import EditStudent from './EditStudent';
 import EditCourse from './EditCourse';
@@ -81,6 +80,8 @@ class ManageCourseDetail extends Component {
       openDeleteCourse: false,
       studentInfo: {}
     };
+    this.editCourse = this.editCourse.bind(this);
+    this.deleteCourse = this.deleteCourse.bind(this);
     this.toggleTab = this.toggleTab.bind(this);
     this.toggleAddStudentModal = this.toggleAddStudentModal.bind(this);
     this.toggleEditStudentModal = this.toggleEditStudentModal.bind(this);
@@ -91,17 +92,64 @@ class ManageCourseDetail extends Component {
   }
 
   componentDidMount() {
-    // Below data will be fetched from classInfo
-    const course = (data.courses && data.courses[0]) || {};
+    const { courseId } = this.props;
+    console.log('course id ', courseId);
+    fetch(`/api/course/${courseId}`)
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(course => {
+        const { classes, students, courseName } = course;
+        this.setState({
+          classes,
+          students,
+          courseName
+        });
+      })
+      .catch(err => console.log(err));
+  }
 
-    const classes = course.classes || [];
-    const courseName = course.courseName || '';
-    const students = course.students || [];
+  editCourse(newCourseName) {
+    const { courseId } = this.props;
+    const body = JSON.stringify({
+      courseName: newCourseName
+    });
+    fetch(`/api/course/${courseId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(courseName => {
+        this.setState({
+          courseName
+        });
+      })
+      .catch(err => console.log(err));
+  }
 
-    this.setState({
-      classes,
-      courseName,
-      students
+  deleteCourse(courseId) {
+    console.log('delete ', courseId);
+    const { teacherId } = this.props;
+    const body = JSON.stringify({
+      teacherId
+    });
+    fetch(`/api/course/${courseId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
+    }).then(response => {
+      if (!response.ok) throw new Error(response.status_text);
+      console.log('redirect');
+      this.props.history.push('/courses');
     });
   }
 
@@ -168,11 +216,11 @@ class ManageCourseDetail extends Component {
       openDeleteCourse,
       studentInfo
     } = this.state;
-    const { teacherInfo } = this.props;
+    const { courseId } = this.props;
 
     return (
       <div className="custom-container">
-        <Header teacherInfo={teacherInfo} />
+        <Header />
         <div style={styles.subContainer}>
           <div style={styles.title}>
             <FaChalkboardTeacher size="40" />
@@ -257,13 +305,16 @@ class ManageCourseDetail extends Component {
         />
         <EditCourse
           isOpen={openEditCourse}
+          editCourse={this.editCourse}
           toggle={this.toggleEditCourseModal}
           courseName={courseName}
         />
         <DeleteCourse
           isOpen={openDeleteCourse}
+          deleteCourse={this.deleteCourse}
           toggle={this.toggleDeleteCourseModal}
           courseName={courseName}
+          courseId={courseId}
         />
         <DeleteStudent
           isOpen={openDeleteStudent}
@@ -276,17 +327,19 @@ class ManageCourseDetail extends Component {
 }
 
 ManageCourseDetail.propTypes = {
-  teacherInfo: PropTypes.object.isRequired
+  courseId: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
   return {
-    teacherInfo: state && state.teacher
+    courseId:
+      (props &&
+        props.location &&
+        props.location.state &&
+        props.location.state.courseId) ||
+      '5ed1d9d5e7179a6b63659629', // prob from redux... or save it in session...?
+    teacherId: state && state.teacher && state.teacher.teacherId
   };
 };
 
-const mapDispatchToProps = () => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ManageCourseDetail);
+export default connect(mapStateToProps, null)(ManageCourseDetail);

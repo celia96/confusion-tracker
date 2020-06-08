@@ -17,6 +17,7 @@ if (process.env.MONGODB_URI) {
   mongoose.connect(process.env.MONGODB_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
+    useFindAndModify: false,
     auth: { authdb: 'admin' }
   });
 } else {
@@ -109,7 +110,7 @@ As a student and a teacher, I would like to see the current status/info of the c
     - receive: class id
     - response: all the info about the class
 */
-// USED & CONFIRMED
+// CONFIRMED & USED - 2
 app.get('/api/class/:classId', async (request, response) => {
   const { classId } = request.params;
   if (!classId) {
@@ -133,7 +134,7 @@ As a teacher, I would like to see the list of courses I created sorted by their 
     - receive: teacher id
     - response: list of courses
 */
-// CONFIRMED
+// CONFIRMED & USED
 app.get('/api/courses/:teacherId', async (request, response) => {
   const { teacherId } = request.params;
   if (!teacherId) {
@@ -159,9 +160,9 @@ app.get('/api/courses/:teacherId', async (request, response) => {
 As a teacher, I would like to create a new course
 - POST: api/course
     - receive: teacherId, course name
-    - response: course
+    - response: new course
 */
-// CONFIRMED
+// CONFIRMED & USED
 app.post('/api/course', async (request, response) => {
   const { teacherId, courseName } = request.body;
   if (!teacherId || !courseName) {
@@ -179,6 +180,9 @@ app.post('/api/course', async (request, response) => {
     if (!newCourse) {
       return response.sendStatus(400);
     }
+    await Teacher.findByIdAndUpdate(teacherId, {
+      $push: { courses: newCourse }
+    });
     return response.json(newCourse);
   } catch (err) {
     return response.sendStatus(500);
@@ -192,7 +196,7 @@ As a teacher, I would like to see the list of classes and students of a given co
     - receive: course id
     - response: course info
 */
-// CONFIRMED
+// CONFIRMED & USED
 app.get('/api/course/:courseId', async (request, response) => {
   const { courseId } = request.params;
   if (!courseId) {
@@ -202,7 +206,7 @@ app.get('/api/course/:courseId', async (request, response) => {
     const course = await Course.findById(courseId)
       .populate({
         path: 'classes',
-        select: '_id dateCreated attendees'
+        select: '_id courseName dateCreated attendees'
       })
       .populate('students');
     if (!course) {
@@ -220,7 +224,7 @@ As a teacher, I would like to update info of a given course.
     - receive: course id, courseName
     - response: course info
 */
-// CONFIRMED
+// CONFIRMED & USED
 app.put('/api/course/:courseId', async (request, response) => {
   const { courseId } = request.params;
   const { courseName } = request.body;
@@ -229,7 +233,7 @@ app.put('/api/course/:courseId', async (request, response) => {
   }
   try {
     await Course.findByIdAndUpdate(courseId, { courseName });
-    return response.json({ courseName });
+    return response.json(courseName);
   } catch (err) {
     return response.sendStatus(500);
   }
@@ -238,17 +242,21 @@ app.put('/api/course/:courseId', async (request, response) => {
 /*
 As a teacher, I would like to delete a course
 - DELETE: api/course
-    - receive: course id
+    - receive: course id, teacher id
     - response: ok
 */
-// CONFIRMED
+// CONFIRMED & USED
 app.delete('/api/course/:courseId', async (request, response) => {
   const { courseId } = request.params;
-  if (!courseId) {
+  const { teacherId } = request.body;
+  if (!courseId || !teacherId) {
     return response.sendStatus(400);
   }
   try {
     await Course.findByIdAndDelete(courseId);
+    await Teacher.findByIdAndUpdate(teacherId, {
+      $pull: { courses: courseId }
+    });
     return response.sendStatus(200);
   } catch (err) {
     return response.sendStatus(500);
@@ -289,24 +297,36 @@ app.post('/api/course/students/:courseId', async (request, response) => {
 
 /* Manage Class Analytics */
 /*
-As a teacher, I would like to see the data/info of the class of the given date
-- GET: api/course/:courseId/:classId
-    - receive: course id, class id
-    - response: class data/info
+As a teacher, I would like to delete a class of a given date
+- DELETE: api/class/:classId
+    - receive: class id, course id
+    - response: ok
 */
 // NEED TEST
 app.delete('/api/class/:classId', async (request, response) => {
   const { classId } = request.params;
+  const { courseId } = request.body;
   if (!classId) {
     return response.sendStatus(400);
   }
   try {
     await Class.findByIdAndDelete(classId);
+    await Course.findByIdAndUpdate(courseId, {
+      $pull: { classes: classId }
+    });
     return response.sendStatus(200);
   } catch (err) {
     return response.sendStatus(500);
   }
 });
+
+// When create a course, append it to the teacher as well (0)
+// When delete a course, remove it from the teacher as well (0)
+
+// When create a class, append it to the course as well (x)
+// When delete a class, remove it from the courses as well (0)
+
+// redirect after deletion
 
 module.exports = {
   app

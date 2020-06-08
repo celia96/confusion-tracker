@@ -45,7 +45,7 @@ const CourseList = ({ courses }) => {
           {courses.map((course, index) => (
             <tr
               style={{ textAlign: 'center' }}
-              key={course.courseName + course.id}
+              key={course.courseName + course._id}
             >
               <th scope="row" style={styles.aligned}>
                 {index + 1}
@@ -58,7 +58,12 @@ const CourseList = ({ courses }) => {
               <td />
               <td style={{ textAlign: 'center', ...styles.aligned }}>
                 <Link
-                  to={`/courses/${course.courseName}`}
+                  to={{
+                    pathname: `/courses/${course.courseName}`,
+                    state: {
+                      courseId: course._id
+                    }
+                  }}
                   className="router-link"
                 >
                   <Button style={styles.button}>View</Button>
