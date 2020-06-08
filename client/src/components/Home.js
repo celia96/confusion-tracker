@@ -17,7 +17,7 @@ const styles = {
   }
 };
 
-const MainPage = () => (
+const Home = () => (
   <Container>
     <div style={{ margin: '30px' }} />
     <img src={logo} style={styles.logo} alt="logo" />
@@ -33,4 +33,4 @@ const MainPage = () => (
   </Container>
 );
 
-export default MainPage;
+export default Home;

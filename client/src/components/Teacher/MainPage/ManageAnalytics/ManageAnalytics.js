@@ -11,8 +11,6 @@ import { BsGraphUp } from 'react-icons/bs';
 import Header from '../Header';
 import DeleteClass from './DeleteClass';
 
-import data from '../../../../data/data.json';
-
 const styles = {
   subHeaderContainer: {
     display: 'flex',
@@ -138,16 +136,24 @@ class ManageAnalytics extends Component {
   }
 
   componentDidMount() {
-    // fetch
-    const { dateCreated, courseName, chartData, students } = data;
-    const timestamp = moment(dateCreated).format('YYYY/MM/DD');
-    console.log('props ', this.props);
-    this.setState({
-      courseName,
-      timestamp,
-      chartData,
-      students
-    });
+    const { classId } = this.props;
+    console.log('class id ', classId);
+    fetch(`/api/class/${classId}`)
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(classRoom => {
+        const { courseName, chartData, dateCreated, attendees } = classRoom;
+        const timestamp = moment(dateCreated).format('MM-DD-YYYY');
+        this.setState({
+          courseName,
+          timestamp,
+          chartData,
+          students: Object.keys(attendees)
+        });
+      })
+      .catch(err => console.log(err));
   }
 
   toggleDeleteClassModal() {
@@ -165,11 +171,10 @@ class ManageAnalytics extends Component {
       chartData,
       openDeleteClass
     } = this.state;
-    const { teacherInfo } = this.props;
 
     return (
       <div className="custom-container">
-        <Header teacherInfo={teacherInfo} />
+        <Header />
         <div style={styles.subHeaderContainer}>
           <div style={styles.title}>
             <IoMdAnalytics size="40" />
@@ -197,17 +202,13 @@ class ManageAnalytics extends Component {
 }
 
 ManageAnalytics.propTypes = {
-  teacherInfo: PropTypes.object.isRequired
+  classId: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
   return {
-    teacherInfo: state && state.teacher
+    classId: props && props.location.state.classId
   };
 };
 
-const mapDispatchToProps = () => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ManageAnalytics);
+export default connect(mapStateToProps, null)(ManageAnalytics);

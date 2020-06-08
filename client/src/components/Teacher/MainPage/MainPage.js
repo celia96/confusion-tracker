@@ -1,7 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { FaPlay } from 'react-icons/fa';
 import { MdSchool } from 'react-icons/md';
 import { GrUserSettings } from 'react-icons/gr';
@@ -59,10 +57,10 @@ const styles = {
   }
 };
 
-const MainPage = ({ teacherInfo }) => {
+const MainPage = () => {
   return (
     <div className="custom-container">
-      <Header teacherInfo={teacherInfo} />
+      <Header />
       <div style={styles.subContainer}>
         <div style={styles.messageContainer} />
         <div style={styles.optionContainer}>
@@ -91,18 +89,4 @@ const MainPage = ({ teacherInfo }) => {
   );
 };
 
-MainPage.propTypes = {
-  teacherInfo: PropTypes.object.isRequired
-};
-
-const mapStateToProps = state => {
-  return {
-    teacherInfo: state && state.teacher
-  };
-};
-
-const mapDispatchToProps = () => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainPage);
+export default MainPage;

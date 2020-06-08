@@ -180,7 +180,7 @@ class ProfileSetting extends Component {
 
     return (
       <div className="custom-container">
-        <Header teacherInfo={teacherInfo} />
+        <Header />
         <div
           style={{
             display: 'flex',

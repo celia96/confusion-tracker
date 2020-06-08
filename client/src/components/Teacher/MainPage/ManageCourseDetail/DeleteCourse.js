@@ -17,7 +17,13 @@ const styles = {
   }
 };
 
-const DeleteCourse = ({ isOpen, toggle, courseName }) => {
+const DeleteCourse = ({
+  isOpen,
+  deleteCourse,
+  toggle,
+  courseName,
+  courseId
+}) => {
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>Delete {courseName}</ModalHeader>
@@ -25,7 +31,14 @@ const DeleteCourse = ({ isOpen, toggle, courseName }) => {
         Are you sure you want to delete {courseName}?
       </ModalBody>
       <ModalFooter style={styles.modalFooter}>
-        <Button color="primary" onClick={toggle} style={styles.confirmButton}>
+        <Button
+          color="primary"
+          onClick={() => {
+            deleteCourse(courseId);
+            toggle();
+          }}
+          style={styles.confirmButton}
+        >
           Confirm
         </Button>{' '}
         <Button onClick={toggle}>Cancel</Button>{' '}

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { FaChalkboardTeacher } from 'react-icons/fa';
 import { BsPeopleFill } from 'react-icons/bs';
 import { Table, Button, Badge } from 'reactstrap';
+import moment from 'moment';
 
 const styles = {
   container: {
@@ -52,7 +53,7 @@ const styles = {
   }
 };
 
-const ClassList = ({ classes, courseName }) => {
+const ClassList = ({ classes }) => {
   return (
     <div style={styles.container}>
       <div style={styles.subContainer}>
@@ -62,14 +63,14 @@ const ClassList = ({ classes, courseName }) => {
             <span style={{ margin: '5px' }} />
             <FaChalkboardTeacher size="30" />
             <span style={{ margin: '1px' }} />
-            <Badge style={styles.largeBadge}>3</Badge>
+            <Badge style={styles.largeBadge}>{classes.length}</Badge>
           </div>
         </div>
         <Table hover style={styles.tableContainer}>
           <thead style={{ backgroundColor: '#f5f5f5', textAlign: 'center' }}>
             <tr>
               <th style={{ width: '5%' }}>#</th>
-              <th style={{ width: '20%' }}>Date Created</th>
+              <th style={{ width: '25%' }}>Date Created</th>
               <th style={{ width: '50% ' }} />
               <th style={{ textAlign: 'center' }}>Attendees</th>
               <th style={{ textAlign: 'center' }}>Analyitcs</th>
@@ -77,21 +78,34 @@ const ClassList = ({ classes, courseName }) => {
           </thead>
           <tbody>
             {classes.map((item, index) => (
-              <tr style={{ textAlign: 'center' }} key={item}>
+              <tr
+                style={{ textAlign: 'center' }}
+                key={item.courseName + item._id}
+              >
                 <th scope="row" style={styles.aligned}>
                   {index + 1}
                 </th>
-                <td style={styles.aligned}>2020/6/5</td>
+                <td style={styles.aligned}>
+                  {moment(item.dateCreated).format('LL')}
+                </td>
                 <td />
                 <td style={{ textAlign: 'center', ...styles.aligned }}>
                   <BsPeopleFill size="20" />
-                  <Badge style={styles.badge}>25</Badge>
+                  <Badge style={styles.badge}>
+                    {Object.keys(item.attendees).length}
+                  </Badge>
                 </td>
                 <td style={{ textAlign: 'center', ...styles.aligned }}>
                   <Link
-                    to={`/courses/${courseName}/analytics?data=${new Date(
-                      1591473478258
-                    ).toISOString()}`}
+                    to={{
+                      pathname: `/courses/${item.courseName}/analytics`,
+                      search: `?date=${new Date(
+                        item.dateCreated
+                      ).toISOString()}`,
+                      state: {
+                        classId: item._id
+                      }
+                    }}
                     className="router-link"
                   >
                     <Button style={styles.button}>View</Button>
