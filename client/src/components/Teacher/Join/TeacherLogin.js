@@ -169,7 +169,7 @@ class TeacherLogin extends Component {
 }
 
 TeacherLogin.propTypes = {
-  login: PropTypes.func.isRequired
+  setToken: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => {
