@@ -1,4 +1,7 @@
+/* eslint func-names: ["error", "never"] */
+
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const { Schema } = mongoose;
 
@@ -98,7 +101,8 @@ const courseSchema = new mongoose.Schema({
 const teacherSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   firstName: {
     type: String,
@@ -114,6 +118,13 @@ const teacherSchema = new mongoose.Schema({
   },
   courses: [{ type: Schema.Types.ObjectId, ref: 'Course' }]
 });
+
+teacherSchema.methods.generateHash = function(password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8));
+};
+teacherSchema.methods.verifyPassword = function(password) {
+  return bcrypt.compareSync(password, this.password);
+};
 
 const Class = mongoose.model('Class', classSchema);
 const Course = mongoose.model('Course', courseSchema);

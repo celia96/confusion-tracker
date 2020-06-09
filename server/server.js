@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 /* eslint func-names: ["error", "never"] */
+/* eslint no-underscore-dangle: [2, { "allow": ["_id"] }] */
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -9,8 +10,13 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const BearerStrategy = require('passport-http-bearer').Strategy;
+const jwt = require('jwt-simple');
 
+const models = require('./models/models');
+
+const { Class, Course, Teacher } = models;
 const app = express();
+const SECRET = 'MY_SECRET';
 
 // Databased (mlab) setup
 if (process.env.MONGODB_URI) {
@@ -18,15 +24,12 @@ if (process.env.MONGODB_URI) {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useFindAndModify: false,
+    useCreateIndex: true,
     auth: { authdb: 'admin' }
   });
 } else {
   console.log('mongoose connection failed');
 }
-
-const models = require('./models/models');
-
-const { Class, Course, Teacher } = models;
 
 // express only serves static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -56,11 +59,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser((user, done) => {
+  console.log('serialize user ', user);
   done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
   Teacher.findById(id, (err, user) => {
+    console.log('deserialize user ', user);
     done(err, user);
   });
 });
@@ -72,18 +77,18 @@ passport.use(
       passwordField: 'password'
     },
     (email, password, done) => {
-      // Find the user with the given username
       Teacher.findOne({ email }, function(err, user) {
+        const token = jwt.encode(user, SECRET);
         if (err) {
           return done(err);
         }
         if (!user) {
-          return done(null, false);
+          return done(null, false, { message: 'Incorrect email.' });
         }
         if (!user.verifyPassword(password)) {
-          return done(null, false);
+          return done(null, false, { message: 'Incorrect password.' });
         }
-        return done(null, user);
+        return done(null, token);
       });
     }
   )
@@ -91,16 +96,96 @@ passport.use(
 
 passport.use(
   new BearerStrategy(function(token, done) {
-    Teacher.findOne({ token }, function(err, user) {
+    const decoded = jwt.decode(token, SECRET);
+    const { email } = decoded;
+    Teacher.findOne({ email }, function(err, user) {
       if (err) {
         return done(err);
       }
       if (!user) {
         return done(null, false);
       }
-      return done(null, user, { scope: 'read' });
+      return done(null, user, { scope: 'all' });
     });
   })
+);
+
+// CONFIRMED & USED
+app.post(
+  '/api/login',
+  passport.authenticate('local', { session: false }),
+  (req, res) => {
+    const token = req.user;
+    return res.json(token);
+  }
+);
+
+// CONFIRMED & USED
+app.get('/api/logout', function(req, res) {
+  req.logout();
+  res.sendStatus(200);
+});
+
+// CONFIRMED & USED
+app.post('/api/register', async (request, response) => {
+  const { email, password, firstName, lastName } = request.body;
+  if (!email || !firstName || !lastName) {
+    return response.sendStatus(400);
+  }
+  try {
+    const teacher = await Teacher.findOne({ email });
+    if (teacher) {
+      return response.sendStatus(400);
+    }
+    const newTeacher = new Teacher({
+      email,
+      firstName,
+      lastName,
+      password,
+      courses: []
+    });
+    newTeacher.password = newTeacher.generateHash(password);
+    const saved = await newTeacher.save();
+    if (!saved) {
+      return response.sendStatus(400);
+    }
+    return response.json(saved);
+  } catch (err) {
+    return response.sendStatus(500);
+  }
+});
+
+// CONFIRMED & USED
+app.get(
+  '/api/me',
+  passport.authenticate('bearer', { session: false }),
+  (req, res) => {
+    // passport.authenticate('bearer', { session: false }) will grant req.user access
+    res.json(req.user);
+  }
+);
+
+// NEED TEST
+app.post(
+  '/api/me',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const teacherId = request.user._id;
+    const { email, firstName, lastName } = request.body;
+    if (!email || !firstName || !lastName) {
+      return response.sendStatus(400);
+    }
+    try {
+      await Teacher.findByIdAndUpdate(teacherId, {
+        email,
+        firstName,
+        lastName
+      });
+      return response.sendStatus(200);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
+  }
 );
 
 /* In Class */

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { FaUserCircle } from 'react-icons/fa';
 import { MdArrowDropDown } from 'react-icons/md';
@@ -10,6 +10,8 @@ import {
   DropdownMenu,
   DropdownItem
 } from 'reactstrap';
+
+import { logout } from '../../../redux/actions';
 
 import logo from '../../../assets/image.png';
 
@@ -41,7 +43,7 @@ const styles = {
   }
 };
 
-const ProfileDropdown = ({ isOpen, toggle }) => (
+const ProfileDropdown = ({ isOpen, toggle, signout }) => (
   <Dropdown isOpen={isOpen} toggle={toggle}>
     <DropdownToggle tag="span" data-toggle="dropdown" aria-expanded={isOpen}>
       <FaUserCircle size="1.5em" className="pointer" />
@@ -54,21 +56,33 @@ const ProfileDropdown = ({ isOpen, toggle }) => (
         <DropdownItem>Profile Setting</DropdownItem>
       </Link>
       <DropdownItem divider />
-      <DropdownItem>Sign out</DropdownItem>
+      <DropdownItem onClick={signout}>Sign out</DropdownItem>
     </DropdownMenu>
   </Dropdown>
 );
 
-const Header = ({ teacherInfo }) => {
+const Header = ({ teacherInfo, clearStore }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [successLogout, redirect] = useState(false);
   const toggle = () => {
     console.log('toggling');
     setDropdownOpen(prevState => !prevState);
   };
 
+  const signout = () => {
+    fetch('/api/logout')
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        redirect(true);
+        clearStore();
+      })
+      .catch(err => console.log(err));
+  };
+
   const { firstName, lastName } = teacherInfo;
   return (
     <div style={styles.container}>
+      {successLogout ? <Redirect to="/login" /> : null}
       <Link to="/home" className="router-link">
         <img src={logo} style={styles.logo} alt="logo" />
       </Link>
@@ -76,14 +90,19 @@ const Header = ({ teacherInfo }) => {
         {firstName} {lastName}
       </span>
       <div style={styles.profile}>
-        <ProfileDropdown isOpen={dropdownOpen} toggle={toggle} />
+        <ProfileDropdown
+          isOpen={dropdownOpen}
+          toggle={toggle}
+          signout={signout}
+        />
       </div>
     </div>
   );
 };
 
 Header.propTypes = {
-  teacherInfo: PropTypes.object.isRequired
+  teacherInfo: PropTypes.object.isRequired,
+  clearStore: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
@@ -92,4 +111,10 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, null)(Header);
+const mapDispatchToProps = dispatch => {
+  return {
+    clearStore: () => dispatch(logout())
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

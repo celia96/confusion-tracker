@@ -2,8 +2,14 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import NoMatch from './components/NoMatch';
 
+// In Class
 import StudentClassView from './components/Student/Class/StudentClassView';
 import TeacherClassView from './components/Teacher/Class/TeacherClassView';
+
+// Teacher's Pages
+import TeacherLogin from './components/Teacher/Join/TeacherLogin';
+import TeacherRegistration from './components/Teacher/Join/TeacherRegistration';
+
 import MainPage from './components/Teacher/MainPage/MainPage';
 import ProfileSetting from './components/Teacher/MainPage/Profile/ProfileSetting';
 import ManageCourses from './components/Teacher/MainPage/ManageCourses/ManageCourses';
@@ -23,6 +29,14 @@ const routes = [
   {
     path: '/teacher/class/:className',
     component: TeacherClassView
+  },
+  {
+    path: '/login',
+    component: TeacherLogin
+  },
+  {
+    path: '/register',
+    component: TeacherRegistration
   },
   {
     exact: true,

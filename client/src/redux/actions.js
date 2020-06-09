@@ -4,7 +4,9 @@ export const LEAVE_CLASS = 'LEAVE_CLASS';
 export const UPDATE_CONFUSION = 'UPDATE_CONFUSION';
 
 // Teacher
+export const LOAD_PROFILE = 'LOAD_PROFILE';
 export const LOG_IN = 'LOG_IN';
+export const LOG_OUT = 'LOG_OUT';
 
 // Class Room
 export const START_CLASS = 'START_CLASS';
@@ -31,9 +33,22 @@ export const updateConfusion = confusion => {
   };
 };
 
-export const login = teacherInfo => {
+export const login = accessToken => {
   return {
     type: LOG_IN,
+    payload: accessToken
+  };
+};
+
+export const logout = () => {
+  return {
+    type: LOG_OUT
+  };
+};
+
+export const loadProfile = teacherInfo => {
+  return {
+    type: LOAD_PROFILE,
     payload: teacherInfo
   };
 };
