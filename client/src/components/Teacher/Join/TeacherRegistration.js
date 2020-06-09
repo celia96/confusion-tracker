@@ -1,154 +1,217 @@
-/* import {
-  Container,
-  Col,
-  Label,
-  Card,
-  Input,
-  Button,
-  CardTitle
-} from 'reactstrap';
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import logo from '../../../logo.png';
+import { Redirect } from 'react-router-dom';
+import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
+
+const styles = {
+  contentContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 3
+  },
+  formContainer: {
+    maxWidth: '600px',
+    minWidth: '400px',
+    backgroundColor: '#6495ed',
+    padding: '20px',
+    borderRadius: '5px'
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '5px'
+  },
+  titleText: {
+    fontSize: '30px',
+    fontWeight: '600'
+  },
+  submitButton: {
+    width: '100%',
+    marginTop: '20px',
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  },
+  label: {
+    color: '#000',
+    fontWeight: '600'
+  },
+  action: {
+    color: '#fff'
+  }
+};
+
+const RegistrationForm = props => {
+  const {
+    submit,
+    firstName,
+    lastName,
+    email,
+    password,
+    onChangeFirstName,
+    onChangeLastName,
+    onChangeEmail,
+    onChangePassword
+  } = props;
+
+  return (
+    <Form>
+      <FormGroup>
+        <Label style={styles.label}>First Name</Label>
+        <Input
+          value={firstName}
+          onChange={e => onChangeFirstName(e)}
+          type="firstName"
+          name="firstName"
+          id="firstName"
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Last Name</Label>
+        <Input
+          value={lastName}
+          onChange={e => onChangeLastName(e)}
+          type="lastName"
+          name="lastName"
+          id="lastName"
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Email</Label>
+        <Input
+          value={email}
+          onChange={e => onChangeEmail(e)}
+          type="email"
+          name="email"
+          id="email"
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Password</Label>
+        <Input
+          value={password}
+          onChange={e => onChangePassword(e)}
+          type="password"
+          name="password"
+          id="password"
+        />
+      </FormGroup>
+      <Button onClick={submit} style={styles.submitButton}>
+        Submit
+      </Button>
+    </Form>
+  );
+};
 
 class TeacherRegistration extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
       firstName: '',
       lastName: '',
+      email: '',
       password: '',
-      passwordConfirm: ''
+      success: false
     };
-    this.handleEmail = this.handleEmail.bind(this);
-    this.handleFirstName = this.handleFirstName.bind(this);
-    this.handleLastName = this.handleLastName.bind(this);
-    this.handlePassword = this.handlePassword.bind(this);
-    this.handlePasswordConfirm = this.handlePasswordConfirm.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.onChangeFirstName = this.onChangeFirstName.bind(this);
+    this.onChangeLastName = this.onChangeLastName.bind(this);
+    this.onChangeEmail = this.onChangeEmail.bind(this);
+    this.onChangePassword = this.onChangePassword.bind(this);
+    this.submitForm = this.submitForm.bind(this);
   }
 
-  handleEmail(event) {
+  onChangeFirstName(e) {
     this.setState({
-      email: event.target.value
+      firstName: e.target.value
     });
   }
 
-  handleFirstName(event) {
+  onChangeLastName(e) {
     this.setState({
-      firstName: event.target.value
+      lastName: e.target.value
     });
   }
 
-  handleLastName(event) {
+  onChangeEmail(e) {
     this.setState({
-      lastName: event.target.value
+      email: e.target.value
     });
   }
 
-  handlePassword(event) {
+  onChangePassword(e) {
     this.setState({
-      password: event.target.value
+      password: e.target.value
     });
   }
 
-  handlePasswordConfirm(event) {
-    this.setState({
-      passwordConfirm: event.target.value
+  submitForm() {
+    console.log('submit registrartion form');
+    const { firstName, lastName, email, password } = this.state;
+    const body = JSON.stringify({
+      firstName,
+      lastName,
+      email,
+      password
     });
-  }
-
-  handleSubmit() {
-    const { email, firstName, lastName, password } = this.state;
-
-    if (this.state.password === this.state.passwordConfirm) {
-      fetch('/api/teacher/register', {
-        method: 'POST',
-        body: JSON.stringify({
-          email: this.state.email,
-          password: this.state.password
-        }),
-        headers: new Headers({ 'Content-type': 'application/json' })
+    fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
       })
-        .then(response => {
-          if (!response.status !== 200) {
-            throw new Error(response.status_text);
-          }
-          alert('successful registration');
-          this.props.history.push('/login/professor');
-        })
-        .catch(error => {
-          console.log(error);
+      .then(() => {
+        console.log('successful!');
+        this.setState({
+          success: true
         });
-    } else {
-      alert('password mismatch');
-    }
+      })
+      .catch(err => console.log(err));
   }
 
   render() {
+    const { success, firstName, lastName, email, password } = this.state;
     return (
-      <Container>
-        <div style={{ margin: '30px' }} />
-        <img src={logo} style={{ maxWidth: '300px' }} alt="logo" />
-        <Col sm="12" md={{ size: 6, offset: 3 }}>
-          <Card
-            body
-            style={{ backgroundColor: '#c4defc', borderColor: '#c4defc' }}
-          >
-            <CardTitle
-              style={{
-                fontWeight: 600,
-                textAlign: 'left',
-                fontSize: '24px',
-                marginBottom: '30px'
-              }}
-            >
-              Registeration
-            </CardTitle>
-            <Label style={{ textAlign: 'left' }}>Email</Label>
-            <Input
-              onChange={this.handleEmail}
-              type="email"
-              value={this.state.email}
-              style={{ marginBottom: '10px' }}
-            />
-            <Label style={{ textAlign: 'left' }}>Password</Label>
-            <Input
-              onChange={this.handlePassword}
-              type="password"
-              value={this.state.password}
-              style={{ marginBottom: '10px' }}
-            />
-            <Label style={{ textAlign: 'left' }}>Confirm Password</Label>
-            <Input
-              onChange={this.handlePasswordConfirm}
-              type="password"
-              value={this.state.passwordConfirm}
-              style={{ marginBottom: '10px' }}
-            />
-            <Button
-              onClick={this.handleSubmit}
-              style={{
-                backgroundColor: '#75b8ff',
-                borderColor: '#75b8ff',
-                marginBottom: '10px'
-              }}
-            >
-              Register
-            </Button>
-          </Card>
-        </Col>
-      </Container>
+      <div className="custom-container">
+        {success ? <Redirect to="/login" /> : null}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            flex: 1
+          }}
+        >
+          <div style={{ flex: 2 }} />
+          <div style={styles.contentContainer}>
+            <div style={styles.title}>
+              {/* <GrUserSettings size="40" /> */}
+              <span style={{ margin: '5px' }} />
+              <span style={styles.titleText}>Sign up</span>
+            </div>
+            <div style={styles.formContainer}>
+              <RegistrationForm
+                firstName={firstName}
+                lastName={lastName}
+                email={email}
+                password={password}
+                submit={this.submitForm}
+                onChangeFirstName={this.onChangeFirstName}
+                onChangeLastName={this.onChangeLastName}
+                onChangeEmail={this.onChangeEmail}
+                onChangePassword={this.onChangePassword}
+              />
+            </div>
+          </div>
+          <div style={{ flex: 2 }} />
+        </div>
+      </div>
     );
   }
 }
 
-TeacherRegistration.propTypes = {
-  history: PropTypes.shape({
-    push: PropTypes.func.isRequired
-  })
-};
-
 export default TeacherRegistration;
- */

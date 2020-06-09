@@ -1,171 +1,181 @@
-/* import {
-  Container,
-  Col,
-  Label,
-  Card,
-  Input,
-  Button,
-  CardTitle
-} from 'reactstrap';
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
-import logo from '../../../logo.png';
+import { login } from '../../../redux/actions';
+
+const styles = {
+  contentContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 3
+  },
+  formContainer: {
+    maxWidth: '600px',
+    minWidth: '400px',
+    backgroundColor: '#6495ed',
+    padding: '20px',
+    borderRadius: '5px'
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '5px'
+  },
+  titleText: {
+    fontSize: '30px',
+    fontWeight: '600'
+  },
+  submitButton: {
+    width: '100%',
+    marginTop: '20px',
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  },
+  label: {
+    color: '#000',
+    fontWeight: '600'
+  },
+  action: {
+    color: '#fff'
+  }
+};
+
+const LoginForm = props => {
+  const { submit, email, password, onChangeEmail, onChangePassword } = props;
+
+  return (
+    <Form>
+      <FormGroup>
+        <Label style={styles.label}>Email</Label>
+        <Input
+          value={email}
+          onChange={e => onChangeEmail(e)}
+          type="email"
+          name="email"
+          id="email"
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label style={styles.label}>Password</Label>
+        <Input
+          value={password}
+          onChange={e => onChangePassword(e)}
+          type="password"
+          name="password"
+          id="password"
+        />
+      </FormGroup>
+      <Button onClick={submit} style={styles.submitButton}>
+        Submit
+      </Button>
+    </Form>
+  );
+};
 
 class TeacherLogin extends Component {
   constructor(props) {
     super(props);
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      success: false
     };
-    this.handleEmail = this.handleEmail.bind(this);
-    this.handlePassword = this.handlePassword.bind(this);
-    this.handleLogin = this.handleLogin.bind(this);
+    this.onChangeEmail = this.onChangeEmail.bind(this);
+    this.onChangePassword = this.onChangePassword.bind(this);
+    this.submitForm = this.submitForm.bind(this);
   }
 
-  handleEmail(event) {
+  onChangeEmail(e) {
     this.setState({
-      email: event.target.value
+      email: e.target.value
     });
   }
 
-  handlePassword(event) {
+  onChangePassword(e) {
     this.setState({
-      password: event.target.value
+      password: e.target.value
     });
   }
 
-  handleLogin() {
+  submitForm() {
+    console.log('submit login form');
+    const { setToken } = this.props;
     const { email, password } = this.state;
-    fetch('/api/teacher/login', {
+    const body = JSON.stringify({
+      email,
+      password
+    });
+    fetch('/api/login', {
       method: 'POST',
-      body: JSON.stringify({
-        email,
-        password
-      }),
-      headers: new Headers({ 'Content-type': 'application/json' })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body
     })
       .then(response => {
-        if (!response.status !== 200) {
-          throw new Error(response.status_text);
-        }
+        if (!response.ok) throw new Error(response.status_text);
         return response.json();
       })
-      .then(responseJson => {
-        alert('successful login');
-        const { teacher } = responseJson;
-        const { _id, email, firstName, lastName, courses } = teacher;
-        const payload = {
-          teacherId: _id,
-          email,
-          firstName,
-          lastName,
-          courses
-        };
-        this.props.onLogin(payload);
-        this.props.history.push('/teacher/main');
+      .then(token => {
+        console.log('successful!');
+        setToken(token);
+        this.setState({
+          success: true
+        });
       })
-      .catch(error => {
-        alert('Invalid email or password. Try again!');
-        console.log(error);
-      });
+      .catch(err => console.log(err));
   }
 
   render() {
-    const { email, password } = this.state;
+    const { success, email, password } = this.state;
     return (
-      <Container>
-        <div style={{ margin: '30px' }} />
-        <img src={logo} style={{ maxWidth: '300px' }} alt="logo" />
-        <Col sm="12" md={{ size: 6, offset: 3 }}>
-          <Card
-            body
-            style={{ backgroundColor: '#c4defc', borderColor: '#c4defc' }}
-          >
-            <CardTitle
-              style={{
-                fontWeight: 600,
-                textAlign: 'left',
-                fontSize: '24px',
-                marginBottom: '30px'
-              }}
-            >
-              Login
-            </CardTitle>
-            <Label style={{ textAlign: 'left' }}>Email</Label>
-            <Input
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={this.handleEmail}
-            />
-            <div style={{ marginBottom: '10px' }} />
-            <Label style={{ textAlign: 'left' }}>Password</Label>
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={this.handlePassword}
-              style={{ marginBottom: '10px' }}
-            />
-            <Button
-              onClick={this.handleLogin}
-              style={{
-                backgroundColor: '#75b8ff',
-                borderColor: '#75b8ff',
-                marginBottom: '10px'
-              }}
-            >
-              Login
-            </Button>
-            <Link
-              to="/login/teacher/register"
-              style={{ textDecoration: 'none', display: 'flex' }}
-            >
-              <Button
-                style={{
-                  flex: 1,
-                  backgroundColor: '#F5b700',
-                  borderColor: '#F5b700',
-                  marginBottom: '10px'
-                }}
-              >
-                Register
-              </Button>
-            </Link>
-          </Card>
-        </Col>
-      </Container>
+      <div className="custom-container">
+        {success ? <Redirect to="/home" /> : null}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            flex: 1
+          }}
+        >
+          <div style={{ flex: 2 }} />
+          <div style={styles.contentContainer}>
+            <div style={styles.title}>
+              {/* <GrUserSettings size="40" /> */}
+              <span style={{ margin: '5px' }} />
+              <span style={styles.titleText}>Login</span>
+            </div>
+            <div style={styles.formContainer}>
+              <LoginForm
+                email={email}
+                password={password}
+                submit={this.submitForm}
+                onChangeEmail={this.onChangeEmail}
+                onChangePassword={this.onChangePassword}
+              />
+            </div>
+          </div>
+          <div style={{ flex: 2 }} />
+        </div>
+      </div>
     );
   }
 }
 
 TeacherLogin.propTypes = {
-  history: PropTypes.shape({
-    push: PropTypes.func.isRequired
-  })
-};
-
-const mapStateToProps = state => {
-  return {};
+  setToken: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    // update the user state by logging in
-    onLogin: payload =>
-      dispatch({
-        type: 'LOGIN',
-        payload
-      })
+    setToken: token => dispatch(login(token))
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(TeacherLogin);
- */
+export default connect(null, mapDispatchToProps)(TeacherLogin);

@@ -7,6 +7,8 @@ import { FormText, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
 import Header from '../Header';
 
+import { loadProfile } from '../../../../redux/actions';
+
 const styles = {
   contentContainer: {
     display: 'flex',
@@ -52,24 +54,26 @@ const styles = {
   }
 };
 
-const ProfileForm = ({ teacherInfo }) => {
-  const { firstName, lastName, email } = teacherInfo;
-  const [firstNameValue, setFirstName] = useState(firstName);
-  const [lastNameValue, setlastName] = useState(lastName);
-  const [emailValue, setEmail] = useState(email);
-
+const ProfileForm = ({
+  firstName,
+  lastName,
+  email,
+  submit,
+  onChangeFirstName,
+  onChangeLastName,
+  onChangeEmail
+}) => {
   const [isFirstNameDisabled, setFirstNameStatus] = useState(true);
   const [isLastNameDisabled, setLastNameStatus] = useState(true);
   const [isEmailDisabled, setEmailStatus] = useState(true);
-
   return (
     <Form>
       <FormGroup>
         <Label style={styles.label}>First Name</Label>
         <Input
           disabled={isFirstNameDisabled}
-          value={firstNameValue}
-          onChange={e => setFirstName(e.target.value)}
+          value={firstName}
+          onChange={e => onChangeFirstName(e)}
           type="firstName"
           name="firstName"
           id="firstName"
@@ -86,9 +90,9 @@ const ProfileForm = ({ teacherInfo }) => {
           ) : (
             <BsCheck
               className="pointer"
+              style={styles.action}
               size="15"
               onClick={() => setFirstNameStatus(true)}
-              style={styles.action}
               color="#fff"
             />
           )}
@@ -98,8 +102,8 @@ const ProfileForm = ({ teacherInfo }) => {
         <Label style={styles.label}>Last Name</Label>
         <Input
           disabled={isLastNameDisabled}
-          value={lastNameValue}
-          onChange={e => setlastName(e.target.value)}
+          value={lastName}
+          onChange={e => onChangeLastName(e)}
           type="lastName"
           name="lastName"
           id="lastName"
@@ -107,6 +111,7 @@ const ProfileForm = ({ teacherInfo }) => {
         <FormText style={styles.formText}>
           {isLastNameDisabled ? (
             <span
+              className="pointer"
               style={styles.action}
               onClick={() => setLastNameStatus(false)}
             >
@@ -114,9 +119,10 @@ const ProfileForm = ({ teacherInfo }) => {
             </span>
           ) : (
             <BsCheck
+              className="pointer"
+              style={styles.action}
               size="15"
               onClick={() => setLastNameStatus(true)}
-              style={styles.action}
               color="#fff"
             />
           )}
@@ -126,22 +132,27 @@ const ProfileForm = ({ teacherInfo }) => {
         <Label style={styles.label}>Email</Label>
         <Input
           disabled={isEmailDisabled}
-          value={emailValue}
-          onChange={e => setEmail(e.target.value)}
+          value={email}
+          onChange={e => onChangeEmail(e)}
           type="email"
           name="email"
           id="email"
         />
         <FormText style={styles.formText}>
           {isEmailDisabled ? (
-            <span style={styles.pointer} onClick={() => setEmailStatus(false)}>
+            <span
+              className="pointer"
+              style={styles.action}
+              onClick={() => setEmailStatus(false)}
+            >
               Change
             </span>
           ) : (
             <BsCheck
+              className="pointer"
+              style={styles.action}
               size="15"
               onClick={() => setEmailStatus(true)}
-              style={styles.pointer}
               color="#fff"
             />
           )}
@@ -154,15 +165,17 @@ const ProfileForm = ({ teacherInfo }) => {
           value={'******'}
           type="password"
           name="password"
-          id="assword"
+          id="password"
         />
         <FormText style={styles.formText}>
-          <span style={styles.pointer} onClick={() => setLastNameStatus(false)}>
+          <span className="pointer" style={styles.action}>
             Change
           </span>
         </FormText>
       </FormGroup>
-      <Button style={styles.submitButton}>Submit</Button>
+      <Button onClick={submit} style={styles.submitButton}>
+        Submit
+      </Button>
     </Form>
   );
 };
@@ -170,13 +183,89 @@ const ProfileForm = ({ teacherInfo }) => {
 class ProfileSetting extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      firstName: '',
+      lastName: '',
+      email: ''
+    };
+    this.onChangeFirstName = this.onChangeFirstName.bind(this);
+    this.onChangeLastName = this.onChangeLastName.bind(this);
+    this.onChangeEmail = this.onChangeEmail.bind(this);
+    this.submitForm = this.submitForm.bind(this);
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    const { updateProfile, token } = this.props;
+    const bearer = `Bearer ${token}`;
+
+    fetch('/api/me', {
+      headers: {
+        Authorization: bearer,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(teacher => {
+        updateProfile(teacher); // no need to update here... update when changes happen
+        const { firstName, lastName, email } = teacher;
+        this.setState({
+          firstName,
+          lastName,
+          email
+        });
+      })
+      .catch(err => console.log(err));
+  }
+
+  onChangeFirstName(e) {
+    this.setState({
+      firstName: e.target.value
+    });
+  }
+
+  onChangeLastName(e) {
+    this.setState({
+      lastName: e.target.value
+    });
+  }
+
+  onChangeEmail(e) {
+    this.setState({
+      email: e.target.value
+    });
+  }
+
+  submitForm() {
+    console.log('submit changed profile');
+    const { email, firstName, lastName } = this.state;
+    const { updateProfile, token } = this.props;
+    const bearer = `Bearer ${token}`;
+    const newTeacher = {
+      email,
+      firstName,
+      lastName
+    };
+    const body = JSON.stringify(newTeacher);
+    fetch('/api/me', {
+      method: 'POST',
+      headers: {
+        Authorization: bearer,
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        updateProfile(newTeacher);
+      })
+      .catch(err => console.log(err));
+  }
 
   render() {
-    const { teacherInfo } = this.props;
+    const { firstName, lastName, email } = this.state;
 
     return (
       <div className="custom-container">
@@ -197,7 +286,15 @@ class ProfileSetting extends Component {
               <span style={styles.titleText}>Profile Setting</span>
             </div>
             <div style={styles.formContainer}>
-              <ProfileForm teacherInfo={teacherInfo} />
+              <ProfileForm
+                firstName={firstName}
+                lastName={lastName}
+                email={email}
+                submit={this.submitForm}
+                onChangeFirstName={this.onChangeFirstName}
+                onChangeLastName={this.onChangeEmail}
+                onChangeEmail={this.onChangeEmail}
+              />
             </div>
           </div>
           <div style={{ flex: 2 }} />
@@ -208,17 +305,20 @@ class ProfileSetting extends Component {
 }
 
 ProfileSetting.propTypes = {
-  teacherInfo: PropTypes.object.isRequired
+  token: PropTypes.string.isRequired,
+  updateProfile: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
   return {
-    teacherInfo: state && state.teacher
+    token: state && state.teacher && state.teacher.clientToken
   };
 };
 
-const mapDispatchToProps = () => {
-  return {};
+const mapDispatchToProps = dispatch => {
+  return {
+    updateProfile: profile => dispatch(loadProfile(profile))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileSetting);
