@@ -123,13 +123,12 @@ class TeacherLogin extends Component {
       })
       .then(teacher => {
         console.log('successful!');
-        const { _id, email, firstName, lastName, token } = teacher;
-        setToken(token);
+        setToken(teacher.token);
         setProfile({
-          email,
-          firstName,
-          lastName,
-          teacherId: _id
+          email: teacher.email,
+          firstName: teacher.firstName,
+          lastName: teacher.lastName,
+          teacherId: teacher._id
         });
         this.setState({
           success: true

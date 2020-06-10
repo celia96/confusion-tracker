@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint func-names: ["error", "never"] */
-/* eslint no-underscore-dangle: [2, { "allow": ["_id"] }] */
+/* eslint no-underscore-dangle: [2, { "allow": ["_id", "_doc"] }] */
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -88,14 +88,7 @@ passport.use(
         if (!user.verifyPassword(password)) {
           return done(null, false, { message: 'Incorrect password.' });
         }
-        const { _id, email, firstName, lastName } = user._doc;
-        const response = {
-          _id,
-          email,
-          firstName,
-          lastName,
-          token
-        };
+        const response = { ...user._doc, token };
         return done(null, response);
       });
     }
