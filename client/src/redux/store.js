@@ -10,6 +10,11 @@ const persistConfig = {
 };
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = createStore(persistedReducer);
+/* eslint-disable no-underscore-dangle */
+export const store = createStore(
+  persistedReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
+/* eslint-enable */
 export const persistentStore = persistStore(store);
-persistentStore.purge();
+// persistentStore.purge();

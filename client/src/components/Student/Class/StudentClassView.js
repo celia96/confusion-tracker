@@ -12,7 +12,6 @@ import {
   joinClassRoom,
   leaveClassRoom
 } from '../../../redux/actions';
-import { store } from '../../../redux/store';
 
 const styles = {
   contentContainer: {
@@ -65,7 +64,6 @@ class StudentClassView extends Component {
   }
 
   componentDidMount() {
-    console.log('store ', store.getState());
     const { socket, studentId, classId, updateMyConfusion } = this.props;
 
     socket.emit('joinClass', { studentId, isOrganizer: false, classId });

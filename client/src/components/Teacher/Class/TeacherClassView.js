@@ -6,7 +6,6 @@ import ConfusionGraph from './ConfusionGraph';
 import QuestionList from './QuestionList';
 import Menu from './Menu';
 
-import { store } from '../../../redux/store';
 import { updateClass, endClass } from '../../../redux/actions';
 
 const styles = {
@@ -40,7 +39,6 @@ class TeacherClassView extends Component {
     socket.on('classRoom', classRoom => {
       const { questions, attendees } = classRoom;
       // console.log('updated', questions);
-      console.log('store ', store.getState());
       updateClassInfo({ questions, students: Object.keys(attendees) });
     });
     socket.on('message', message => {

@@ -92,9 +92,16 @@ class ManageCourseDetail extends Component {
   }
 
   componentDidMount() {
-    const { courseId } = this.props;
+    const { courseId, token } = this.props;
+    const bearer = `Bearer ${token}`;
     console.log('course id ', courseId);
-    fetch(`/api/course/${courseId}`)
+
+    fetch(`/api/course/${courseId}`, {
+      headers: {
+        Authorization: bearer,
+        'Content-Type': 'application/json'
+      }
+    })
       .then(response => {
         if (!response.ok) throw new Error(response.status_text);
         return response.json();
@@ -111,13 +118,16 @@ class ManageCourseDetail extends Component {
   }
 
   editCourse(newCourseName) {
-    const { courseId } = this.props;
+    const { courseId, token } = this.props;
+    const bearer = `Bearer ${token}`;
     const body = JSON.stringify({
       courseName: newCourseName
     });
+
     fetch(`/api/course/${courseId}`, {
       method: 'PUT',
       headers: {
+        Authorization: bearer,
         'Content-Type': 'application/json'
       },
       body
@@ -136,21 +146,22 @@ class ManageCourseDetail extends Component {
 
   deleteCourse(courseId) {
     console.log('delete ', courseId);
-    const { teacherId } = this.props;
-    const body = JSON.stringify({
-      teacherId
-    });
+    const { token } = this.props;
+    const bearer = `Bearer ${token}`;
+
     fetch(`/api/course/${courseId}`, {
       method: 'DELETE',
       headers: {
+        Authorization: bearer,
         'Content-Type': 'application/json'
-      },
-      body
-    }).then(response => {
-      if (!response.ok) throw new Error(response.status_text);
-      console.log('redirect');
-      this.props.history.push('/courses');
-    });
+      }
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        console.log('redirect');
+        this.props.history.push('/courses');
+      })
+      .catch(err => console.log(err));
   }
 
   toggleTab(tab) {
@@ -338,7 +349,8 @@ const mapStateToProps = (state, props) => {
         props.location.state &&
         props.location.state.courseId) ||
       '5ed1d9d5e7179a6b63659629', // prob from redux... or save it in session...?
-    teacherId: state && state.teacher && state.teacher.teacherId
+    teacherId: state && state.teacher && state.teacher.teacherId,
+    token: state && state.teacher && state.teacher.clientToken
   };
 };
 

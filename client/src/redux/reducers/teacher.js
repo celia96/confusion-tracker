@@ -2,10 +2,10 @@ import { LOAD_PROFILE, LOG_IN, LOG_OUT } from '../actions';
 
 const defaultState = {
   clientToken: '',
-  teacherId: '5edd3638e7179a6b6368147d',
-  email: 'celiachoy96@gmail.com',
-  firstName: 'Celia',
-  lastName: 'Choy'
+  teacherId: '',
+  email: '',
+  firstName: '',
+  lastName: ''
 };
 
 const teacher = (state = defaultState, action) => {

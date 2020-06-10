@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint func-names: ["error", "never"] */
-/* eslint no-underscore-dangle: [2, { "allow": ["_id"] }] */
+/* eslint no-underscore-dangle: [2, { "allow": ["_id", "_doc"] }] */
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -88,7 +88,8 @@ passport.use(
         if (!user.verifyPassword(password)) {
           return done(null, false, { message: 'Incorrect password.' });
         }
-        return done(null, token);
+        const response = { ...user._doc, token };
+        return done(null, response);
       });
     }
   )
@@ -110,23 +111,22 @@ passport.use(
   })
 );
 
-// CONFIRMED & USED
+// CONFIRMED & USED (0)
 app.post(
   '/api/login',
   passport.authenticate('local', { session: false }),
   (req, res) => {
-    const token = req.user;
-    return res.json(token);
+    return res.json(req.user);
   }
 );
 
-// CONFIRMED & USED
+// CONFIRMED & USED (0)
 app.get('/api/logout', function(req, res) {
   req.logout();
   res.sendStatus(200);
 });
 
-// CONFIRMED & USED
+// CONFIRMED & USED (0)
 app.post('/api/register', async (request, response) => {
   const { email, password, firstName, lastName } = request.body;
   if (!email || !firstName || !lastName) {
@@ -155,22 +155,22 @@ app.post('/api/register', async (request, response) => {
   }
 });
 
-// CONFIRMED & USED
+// CONFIRMED & USED (0)
 app.get(
   '/api/me',
   passport.authenticate('bearer', { session: false }),
   (req, res) => {
-    // passport.authenticate('bearer', { session: false }) will grant req.user access
     res.json(req.user);
   }
 );
 
-// NEED TEST
+// CONFIRMED & USED (0)
 app.post(
   '/api/me',
   passport.authenticate('bearer', { session: false }),
   async (request, response) => {
-    const teacherId = request.user._id;
+    const teacherId = request.user && request.user._id;
+
     const { email, firstName, lastName } = request.body;
     if (!email || !firstName || !lastName) {
       return response.sendStatus(400);
@@ -195,7 +195,7 @@ As a student and a teacher, I would like to see the current status/info of the c
     - receive: class id
     - response: all the info about the class
 */
-// CONFIRMED & USED - 2
+// CONFIRMED & USED - 2 (by Teacher and Student)
 app.get('/api/class/:classId', async (request, response) => {
   const { classId } = request.params;
   if (!classId) {
@@ -219,27 +219,32 @@ As a teacher, I would like to see the list of courses I created sorted by their 
     - receive: teacher id
     - response: list of courses
 */
-// CONFIRMED & USED
-app.get('/api/courses/:teacherId', async (request, response) => {
-  const { teacherId } = request.params;
-  if (!teacherId) {
-    return response.sendStatus(400);
-  }
-  try {
-    const teacher = await Teacher.findById(teacherId).populate('courses');
-    const courses = teacher && teacher.courses;
-    if (!teacher || !courses) {
+// CONFIRMED & USED (0)
+app.get(
+  '/api/courses',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const teacherId = request.user && request.user._id;
+
+    if (!teacherId) {
       return response.sendStatus(400);
     }
-    // sort courses by date
-    const sortedCourses = courses.sort(
-      (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
-    );
-    return response.json(sortedCourses);
-  } catch (err) {
-    return response.sendStatus(500);
+    try {
+      const teacher = await Teacher.findById(teacherId).populate('courses');
+      const courses = teacher && teacher.courses;
+      if (!teacher || !courses) {
+        return response.sendStatus(400);
+      }
+      // sort courses by date
+      const sortedCourses = courses.sort(
+        (a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)
+      );
+      return response.json(sortedCourses);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
   }
-});
+);
 
 /*
 As a teacher, I would like to create a new course
@@ -247,32 +252,38 @@ As a teacher, I would like to create a new course
     - receive: teacherId, course name
     - response: new course
 */
-// CONFIRMED & USED
-app.post('/api/course', async (request, response) => {
-  const { teacherId, courseName } = request.body;
-  if (!teacherId || !courseName) {
-    return response.sendStatus(400);
-  }
-  try {
-    const course = new Course({
-      courseName,
-      teacher: teacherId,
-      dateCreated: Date.now(),
-      classes: [],
-      students: []
-    });
-    const newCourse = await course.save();
-    if (!newCourse) {
+// CONFIRMED & USED (0)
+app.post(
+  '/api/course',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const { courseName } = request.body;
+    const teacherId = request.user && request.user._id;
+
+    if (!teacherId || !courseName) {
       return response.sendStatus(400);
     }
-    await Teacher.findByIdAndUpdate(teacherId, {
-      $push: { courses: newCourse }
-    });
-    return response.json(newCourse);
-  } catch (err) {
-    return response.sendStatus(500);
+    try {
+      const course = new Course({
+        courseName,
+        teacher: teacherId,
+        dateCreated: Date.now(),
+        classes: [],
+        students: []
+      });
+      const newCourse = await course.save();
+      if (!newCourse) {
+        return response.sendStatus(400);
+      }
+      await Teacher.findByIdAndUpdate(teacherId, {
+        $push: { courses: newCourse }
+      });
+      return response.json(newCourse);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
   }
-});
+);
 
 /* Manage Course Detail */
 /*
@@ -281,27 +292,31 @@ As a teacher, I would like to see the list of classes and students of a given co
     - receive: course id
     - response: course info
 */
-// CONFIRMED & USED
-app.get('/api/course/:courseId', async (request, response) => {
-  const { courseId } = request.params;
-  if (!courseId) {
-    return response.sendStatus(400);
-  }
-  try {
-    const course = await Course.findById(courseId)
-      .populate({
-        path: 'classes',
-        select: '_id courseName dateCreated attendees'
-      })
-      .populate('students');
-    if (!course) {
+// CONFIRMED & USED (0)
+app.get(
+  '/api/course/:courseId',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const { courseId } = request.params;
+    if (!courseId) {
       return response.sendStatus(400);
     }
-    return response.json(course);
-  } catch (err) {
-    return response.sendStatus(500);
+    try {
+      const course = await Course.findById(courseId)
+        .populate({
+          path: 'classes',
+          select: '_id courseName dateCreated attendees'
+        })
+        .populate('students');
+      if (!course) {
+        return response.sendStatus(400);
+      }
+      return response.json(course);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
   }
-});
+);
 
 /*
 As a teacher, I would like to update info of a given course.
@@ -309,20 +324,24 @@ As a teacher, I would like to update info of a given course.
     - receive: course id, courseName
     - response: course info
 */
-// CONFIRMED & USED
-app.put('/api/course/:courseId', async (request, response) => {
-  const { courseId } = request.params;
-  const { courseName } = request.body;
-  if (!courseId || !courseName) {
-    return response.sendStatus(400);
+// CONFIRMED & USED (0)
+app.put(
+  '/api/course/:courseId',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const { courseId } = request.params;
+    const { courseName } = request.body;
+    if (!courseId || !courseName) {
+      return response.sendStatus(400);
+    }
+    try {
+      await Course.findByIdAndUpdate(courseId, { courseName });
+      return response.json(courseName);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
   }
-  try {
-    await Course.findByIdAndUpdate(courseId, { courseName });
-    return response.json(courseName);
-  } catch (err) {
-    return response.sendStatus(500);
-  }
-});
+);
 
 /*
 As a teacher, I would like to delete a course
@@ -330,23 +349,28 @@ As a teacher, I would like to delete a course
     - receive: course id, teacher id
     - response: ok
 */
-// CONFIRMED & USED
-app.delete('/api/course/:courseId', async (request, response) => {
-  const { courseId } = request.params;
-  const { teacherId } = request.body;
-  if (!courseId || !teacherId) {
-    return response.sendStatus(400);
+// CONFIRMED & USED (0)
+app.delete(
+  '/api/course/:courseId',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const { courseId } = request.params;
+    const teacherId = request.user && request.user._id;
+
+    if (!courseId || !teacherId) {
+      return response.sendStatus(400);
+    }
+    try {
+      await Course.findByIdAndDelete(courseId);
+      await Teacher.findByIdAndUpdate(teacherId, {
+        $pull: { courses: courseId }
+      });
+      return response.sendStatus(200);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
   }
-  try {
-    await Course.findByIdAndDelete(courseId);
-    await Teacher.findByIdAndUpdate(teacherId, {
-      $pull: { courses: courseId }
-    });
-    return response.sendStatus(200);
-  } catch (err) {
-    return response.sendStatus(500);
-  }
-});
+);
 
 /*
 As a teacher, I would like to add a student to a given course.
@@ -355,7 +379,7 @@ As a teacher, I would like to add a student to a given course.
     - response: updated course info
 */
 // NEED TEST & NOT SURE IF THIS IS NEEDED (TBD)
-app.post('/api/course/students/:courseId', async (request, response) => {
+/* app.post('/api/course/students/:courseId', async (request, response) => {
   const { courseId } = request.params;
   const { name, studentId, email } = request.body;
   if (!studentId) {
@@ -379,6 +403,7 @@ app.post('/api/course/students/:courseId', async (request, response) => {
     return response.sendStatus(500);
   }
 });
+ */
 
 /* Manage Class Analytics */
 /*
@@ -387,23 +412,27 @@ As a teacher, I would like to delete a class of a given date
     - receive: class id, course id
     - response: ok
 */
-// NEED TEST
-app.delete('/api/class/:classId', async (request, response) => {
-  const { classId } = request.params;
-  const { courseId } = request.body;
-  if (!classId) {
-    return response.sendStatus(400);
+// NEED TEST (not used yet)
+app.delete(
+  '/api/class/:classId',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const { classId } = request.params;
+    const { courseId } = request.body;
+    if (!classId) {
+      return response.sendStatus(400);
+    }
+    try {
+      await Class.findByIdAndDelete(classId);
+      await Course.findByIdAndUpdate(courseId, {
+        $pull: { classes: classId }
+      });
+      return response.sendStatus(200);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
   }
-  try {
-    await Class.findByIdAndDelete(classId);
-    await Course.findByIdAndUpdate(courseId, {
-      $pull: { classes: classId }
-    });
-    return response.sendStatus(200);
-  } catch (err) {
-    return response.sendStatus(500);
-  }
-});
+);
 
 // When create a course, append it to the teacher as well (0)
 // When delete a course, remove it from the teacher as well (0)

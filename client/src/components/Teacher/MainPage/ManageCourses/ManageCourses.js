@@ -52,9 +52,15 @@ class ManageCourses extends Component {
   }
 
   componentDidMount() {
-    // fetch
-    const { teacherId } = this.props;
-    fetch(`/api/courses/${teacherId}`)
+    const { token } = this.props;
+    const bearer = `Bearer ${token}`;
+
+    fetch('/api/courses', {
+      headers: {
+        Authorization: bearer,
+        'Content-Type': 'application/json'
+      }
+    })
       .then(response => {
         if (!response.ok) throw new Error(response.status_text);
         return response.json();
@@ -76,16 +82,16 @@ class ManageCourses extends Component {
   }
 
   addCourse(courseName) {
-    console.log('adding course ', courseName);
-    const { teacherId } = this.props;
+    const { token } = this.props;
+    const bearer = `Bearer ${token}`;
     const body = JSON.stringify({
-      teacherId,
       courseName
     });
-    console.log('bodty ', body);
+
     fetch('/api/course', {
       method: 'POST',
       headers: {
+        Authorization: bearer,
         'Content-Type': 'application/json'
       },
       body
@@ -133,12 +139,14 @@ class ManageCourses extends Component {
 }
 
 ManageCourses.propTypes = {
-  teacherId: PropTypes.string.isRequired
+  teacherId: PropTypes.string.isRequired,
+  token: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => {
   return {
-    teacherId: state && state.teacher.teacherId
+    teacherId: state && state.teacher.teacherId,
+    token: state && state.teacher && state.teacher.clientToken
   };
 };
 

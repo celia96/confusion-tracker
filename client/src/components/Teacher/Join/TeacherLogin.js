@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
-import { login } from '../../../redux/actions';
+import { login, loadProfile } from '../../../redux/actions';
 
 const styles = {
   contentContainer: {
@@ -104,7 +104,7 @@ class TeacherLogin extends Component {
 
   submitForm() {
     console.log('submit login form');
-    const { setToken } = this.props;
+    const { setToken, setProfile } = this.props;
     const { email, password } = this.state;
     const body = JSON.stringify({
       email,
@@ -121,9 +121,15 @@ class TeacherLogin extends Component {
         if (!response.ok) throw new Error(response.status_text);
         return response.json();
       })
-      .then(token => {
+      .then(teacher => {
         console.log('successful!');
-        setToken(token);
+        setToken(teacher.token);
+        setProfile({
+          email: teacher.email,
+          firstName: teacher.firstName,
+          lastName: teacher.lastName,
+          teacherId: teacher._id
+        });
         this.setState({
           success: true
         });
@@ -169,11 +175,13 @@ class TeacherLogin extends Component {
 }
 
 TeacherLogin.propTypes = {
+  setProfile: PropTypes.func.isRequired,
   setToken: PropTypes.func.isRequired
 };
 
 const mapDispatchToProps = dispatch => {
   return {
+    setProfile: teacherInfo => dispatch(loadProfile(teacherInfo)),
     setToken: token => dispatch(login(token))
   };
 };

@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import Chart from 'react-apexcharts';
 import moment from 'moment';
 
-// import { store } from '../../../redux/store';
 import { updateClass } from '../../../redux/actions';
 
 const styles = {
@@ -84,7 +83,6 @@ class ConfusionGraph extends Component {
   }
 
   componentDidMount() {
-    // console.log('store ', store.getState());
     this.fetchConfusion();
     this.interval = setInterval(() => {
       this.fetchConfusion();
