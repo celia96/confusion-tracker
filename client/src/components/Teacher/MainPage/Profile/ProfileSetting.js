@@ -195,7 +195,7 @@ class ProfileSetting extends Component {
   }
 
   componentDidMount() {
-    const { updateProfile, token } = this.props;
+    const { token } = this.props;
     const bearer = `Bearer ${token}`;
 
     fetch('/api/me', {
@@ -209,7 +209,6 @@ class ProfileSetting extends Component {
         return response.json();
       })
       .then(teacher => {
-        updateProfile(teacher); // no need to update here... update when changes happen
         const { firstName, lastName, email } = teacher;
         this.setState({
           firstName,

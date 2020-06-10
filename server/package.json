@@ -7,6 +7,7 @@
   "scripts": {
     "test": "jest --setupFiles dotenv/config --detectOpenHandles --forceExit",
     "lint": "eslint .",
+    "devStart": "set NODE_ENV=dev && node -r dotenv/config index.js",
     "start": "node -r dotenv/config index.js",
     "source": "source env.sh",
     "watch": "nodemon --exec 'node -r dotenv/config' --ignore '*.test.js' index.js"

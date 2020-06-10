@@ -1,7 +1,7 @@
 import { JOIN_CLASS, LEAVE_CLASS, UPDATE_CONFUSION } from '../actions';
 
 const defaultState = {
-  studentId: '00669404',
+  studentId: '',
   confusionState: false
 };
 
