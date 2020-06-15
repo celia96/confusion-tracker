@@ -2,14 +2,23 @@ import { JOIN_CLASS, LEAVE_CLASS, UPDATE_CONFUSION } from '../actions';
 
 const defaultState = {
   studentId: '',
-  confusionState: false
+  confusionState: false,
+  currentClass: {
+    classId: '',
+    courseName: ''
+  }
 };
 
 const student = (state = defaultState, action) => {
   switch (action.type) {
     case JOIN_CLASS:
       // update student id
-      return Object.assign({}, state, { studentId: action.payload });
+      const { studentId, classId, courseName } = action.payload;
+      const joinedClass = {
+        classId,
+        courseName
+      };
+      return Object.assign({}, state, { studentId, currentClass: joinedClass });
     case LEAVE_CLASS:
       // empty student id
       return Object.assign({}, defaultState);

@@ -14,6 +14,9 @@ import NoMatch from './components/NoMatch';
 import StudentClassView from './components/Student/Class/StudentClassView';
 import TeacherClassView from './components/Teacher/Class/TeacherClassView';
 
+// Student's Pages
+import StudentLogin from './components/Student/Join/StudentLogin';
+
 // Teacher's Pages
 import TeacherLogin from './components/Teacher/Join/TeacherLogin';
 import TeacherRegistration from './components/Teacher/Join/TeacherRegistration';
@@ -31,12 +34,12 @@ const io = require('socket.io-client');
 
 const routes = [
   {
-    path: '/student/class/:className',
-    component: StudentClassView
+    path: '/join',
+    component: StudentLogin
   },
   {
-    path: '/teacher/class/:className',
-    component: TeacherClassView
+    path: '/student/class/:className',
+    component: StudentClassView
   },
   {
     path: '/login',
@@ -73,6 +76,11 @@ const routes = [
     isProtected: true,
     path: '/courses/:courseName/analytics',
     component: ManageAnalytics
+  },
+  {
+    isProtected: true,
+    path: '/teacher/class/:className',
+    component: TeacherClassView
   }
 ];
 

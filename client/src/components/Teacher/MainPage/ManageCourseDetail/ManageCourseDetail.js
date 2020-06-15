@@ -20,11 +20,14 @@ import Header from '../Header';
 import ClassList from './ClassList';
 import StudentList from './StudentList';
 
+import StartClass from './StartClass';
 import AddStudent from './AddStudent';
 import EditStudent from './EditStudent';
 import EditCourse from './EditCourse';
 import DeleteStudent from './DeleteStudent';
 import DeleteCourse from './DeleteCourse';
+
+import { updateClass } from '../../../../redux/actions';
 
 const styles = {
   subContainer: {
@@ -73,6 +76,7 @@ class ManageCourseDetail extends Component {
       students: [],
       courseName: '',
       activeTab: '1',
+      openStartClass: false,
       openAddStudent: false,
       openEditStudent: false,
       openEditCourse: false,
@@ -80,9 +84,11 @@ class ManageCourseDetail extends Component {
       openDeleteCourse: false,
       studentInfo: {}
     };
+    this.startClass = this.startClass.bind(this);
     this.editCourse = this.editCourse.bind(this);
     this.deleteCourse = this.deleteCourse.bind(this);
     this.toggleTab = this.toggleTab.bind(this);
+    this.toggleStartClass = this.toggleStartClass.bind(this);
     this.toggleAddStudentModal = this.toggleAddStudentModal.bind(this);
     this.toggleEditStudentModal = this.toggleEditStudentModal.bind(this);
     this.toggleEditCourseModal = this.toggleEditCourseModal.bind(this);
@@ -113,6 +119,55 @@ class ManageCourseDetail extends Component {
           students,
           courseName
         });
+      })
+      .catch(err => console.log(err));
+  }
+
+  startClass(roomCode) {
+    const { courseId, token, loadClassRoom } = this.props;
+    const bearer = `Bearer ${token}`;
+    const body = JSON.stringify({
+      roomCode,
+      courseId,
+      courseName: this.state.courseName
+    });
+    console.log('start class');
+
+    fetch('/api/class', {
+      method: 'POST',
+      headers: {
+        Authorization: bearer,
+        'Content-Type': 'application/json'
+      },
+      body
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(response.status_text);
+        return response.json();
+      })
+      .then(classRoom => {
+        // load class to rduex
+        const {
+          _id,
+          courseName,
+          questions,
+          attendees,
+          confusionRate,
+          chartData,
+          dateCreated
+        } = classRoom;
+        const payload = {
+          classId: _id,
+          courseName,
+          questions,
+          attendees,
+          confusionRate,
+          chartData,
+          dateCreated,
+          students: []
+        };
+        loadClassRoom(payload);
+        this.props.history.push(`/teacher/class/${courseName}`);
       })
       .catch(err => console.log(err));
   }
@@ -173,6 +228,13 @@ class ManageCourseDetail extends Component {
     }
   }
 
+  toggleStartClass() {
+    const { openStartClass } = this.state;
+    this.setState({
+      openStartClass: !openStartClass
+    });
+  }
+
   toggleAddStudentModal() {
     const { openAddStudent } = this.state;
     this.setState({
@@ -220,6 +282,7 @@ class ManageCourseDetail extends Component {
       classes,
       students,
       activeTab,
+      openStartClass,
       openAddStudent,
       openEditStudent,
       openEditCourse,
@@ -228,7 +291,7 @@ class ManageCourseDetail extends Component {
       studentInfo
     } = this.state;
     const { courseId } = this.props;
-
+    console.log('classes ', classes);
     return (
       <div className="custom-container">
         <Header />
@@ -244,7 +307,7 @@ class ManageCourseDetail extends Component {
               size="25"
             />
           </div>
-          <Button style={styles.button}>
+          <Button onClick={this.toggleStartClass} style={styles.button}>
             <FaPlay />
             <span style={{ margin: '5px' }} />
             <span>Start Class</span>
@@ -305,6 +368,12 @@ class ManageCourseDetail extends Component {
             </TabPane>
           </TabContent>
         </div>
+        <StartClass
+          isOpen={openStartClass}
+          toggle={this.toggleStartClass}
+          startClass={this.startClass}
+          courseName={courseName}
+        />
         <AddStudent
           isOpen={openAddStudent}
           toggle={this.toggleAddStudentModal}
@@ -344,14 +413,19 @@ ManageCourseDetail.propTypes = {
 const mapStateToProps = (state, props) => {
   return {
     courseId:
-      (props &&
-        props.location &&
-        props.location.state &&
-        props.location.state.courseId) ||
-      '5ed1d9d5e7179a6b63659629', // prob from redux... or save it in session...?
+      props &&
+      props.location &&
+      props.location.state &&
+      props.location.state.courseId,
     teacherId: state && state.teacher && state.teacher.teacherId,
     token: state && state.teacher && state.teacher.clientToken
   };
 };
 
-export default connect(mapStateToProps, null)(ManageCourseDetail);
+const mapDispatchToProps = dispatch => {
+  return {
+    loadClassRoom: classRoom => dispatch(updateClass(classRoom))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ManageCourseDetail);

@@ -13,14 +13,14 @@ export const START_CLASS = 'START_CLASS';
 export const UPDATE_CLASS = 'UPDATE_CHART';
 export const END_CLASS = 'END_CLASS';
 
-export const joinClassRoom = studentId => {
+export const joinClass = payload => {
   return {
     type: JOIN_CLASS,
-    payload: studentId
+    payload
   };
 };
 
-export const leaveClassRoom = () => {
+export const leaveClass = () => {
   return {
     type: LEAVE_CLASS
   };

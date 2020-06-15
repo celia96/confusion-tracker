@@ -145,6 +145,8 @@ class ManageAnalytics extends Component {
       })
       .then(classRoom => {
         const { courseName, chartData, dateCreated, attendees } = classRoom;
+        console.log('classroom ', classRoom);
+        console.log('date ', dateCreated);
         const timestamp = moment(dateCreated).format('MM-DD-YYYY');
         this.setState({
           courseName,

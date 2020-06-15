@@ -35,16 +35,19 @@ Class
 */
 
 const classSchema = new mongoose.Schema({
-  course: {
-    type: Schema.ObjectId,
-    ref: 'Course'
-  },
-  teacher: {
-    type: Schema.ObjectId,
-    ref: 'Teacher'
+  roomCode: {
+    type: String
   },
   courseName: {
     type: String
+  },
+  courseId: {
+    type: Schema.ObjectId,
+    ref: 'Course'
+  },
+  teacherId: {
+    type: Schema.ObjectId,
+    ref: 'Teacher'
   },
   confusionRate: {
     type: Number,
@@ -73,7 +76,7 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  teacher: {
+  teacherId: {
     type: Schema.ObjectId,
     ref: 'Teacher'
   },
