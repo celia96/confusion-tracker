@@ -5,6 +5,7 @@ const defaultState = {
   courseName: '',
   questions: {},
   students: [],
+  attendees: {},
   confusionRate: 0,
   chartData: [],
   dateCreated: ''

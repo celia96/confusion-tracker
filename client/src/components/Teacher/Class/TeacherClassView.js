@@ -61,9 +61,10 @@ class TeacherClassView extends Component {
   }
 
   end() {
-    const { socket, classId, chartData, stopClass } = this.props;
+    console.log('stop class');
+    /* const { socket, classId, chartData, stopClass } = this.props;
     socket.emit('endClass', { classId, chartData });
-    stopClass();
+    stopClass(); */
   }
 
   render() {

@@ -188,30 +188,6 @@ app.post(
   }
 );
 
-/* In Class */
-/*
-As a student and a teacher, I would like to see the current status/info of the class
-- GET: api/class/:classId
-    - receive: class id
-    - response: all the info about the class
-*/
-// CONFIRMED & USED - 2 (by Teacher and Student)
-app.get('/api/class/:classId', async (request, response) => {
-  const { classId } = request.params;
-  if (!classId) {
-    return response.sendStatus(400);
-  }
-  try {
-    const classRoom = await Class.findById(classId);
-    if (!classRoom) {
-      return response.sendStatus(400);
-    }
-    return response.json(classRoom);
-  } catch (err) {
-    return response.sendStatus(500);
-  }
-});
-
 /* Manage Course */
 /*
 As a teacher, I would like to see the list of courses I created sorted by their dates
@@ -266,7 +242,7 @@ app.post(
     try {
       const course = new Course({
         courseName,
-        teacher: teacherId,
+        teacherId,
         dateCreated: Date.now(),
         classes: [],
         students: []
@@ -405,7 +381,109 @@ As a teacher, I would like to add a student to a given course.
 });
  */
 
-/* Manage Class Analytics */
+/* In Class & Class Analytics */
+/*
+As a teacher, I would like to create and start a class
+- POST: api/class
+    - receive: course id, course name
+    - response: all the info about the class
+*/
+// CONFIRMED
+app.post(
+  '/api/class',
+  passport.authenticate('bearer', { session: false }),
+  async (request, response) => {
+    const { roomCode, courseId, courseName } = request.body;
+    const teacherId = request.user && request.user._id;
+
+    if (!teacherId || !roomCode || !courseId || !courseName) {
+      return response.sendStatus(400);
+    }
+    try {
+      const exist = await Class.findOne({ roomCode });
+      if (exist) {
+        // roomCode already exists
+        return response.sendStatus(409);
+      }
+      const newClass = new Class({
+        roomCode,
+        courseName,
+        courseId,
+        teacherId,
+        confusionRate: 0,
+        attendees: new Map(),
+        questions: new Map(),
+        dateCreated: Date.now(),
+        chartData: [],
+        isOver: false
+      });
+      const classRoom = await newClass.save();
+      if (!classRoom) {
+        return response.sendStatus(400);
+      }
+      await Course.findByIdAndUpdate(courseId, {
+        $push: { classes: classRoom }
+      });
+      return response.json(classRoom);
+    } catch (err) {
+      return response.sendStatus(500);
+    }
+  }
+);
+
+/*
+As a student, I would like to gain access to the class via room code
+- GET: api/class/roomCode/:roomCode
+    - receive: roomCode
+    - response: true or false (if the room exists && the room isOver !== true)
+*/
+// NEED TEST
+app.get('/api/class/roomCode/:roomCode', async (request, response) => {
+  const { roomCode } = request.params;
+  if (!roomCode) {
+    return response.sendStatus(400);
+  }
+  try {
+    const classRoom = await Class.findOne({ roomCode });
+    const canAccess = classRoom && classRoom.isOver;
+    const courseName = classRoom && classRoom.courseName;
+    const classId = classRoom && classRoom._id;
+    const payload = {
+      canAccess,
+      courseName,
+      classId
+    };
+    return response.json(payload);
+  } catch (err) {
+    return response.sendStatus(500);
+  }
+});
+
+/*
+As a student and a teacher, I would like to see the current status/info of the class
+- GET: api/class/:classId
+    - receive: class id
+    - response: all the info about the class
+*/
+// CONFIRMED & USED - 2 (by Teacher and Student)
+app.get('/api/class/:classId', async (request, response) => {
+  const { classId } = request.params;
+  if (!classId) {
+    return response.sendStatus(400);
+  }
+  console.log('classid ', classId);
+  try {
+    const classRoom = await Class.findById(classId);
+    console.log('classRoom ', classRoom);
+    if (!classRoom) {
+      return response.sendStatus(400);
+    }
+    return response.json(classRoom);
+  } catch (err) {
+    return response.sendStatus(500);
+  }
+});
+
 /*
 As a teacher, I would like to delete a class of a given date
 - DELETE: api/class/:classId

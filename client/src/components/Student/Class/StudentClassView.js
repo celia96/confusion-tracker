@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Redirect } from 'react-router-dom';
 
 import Header from './Header';
 import ConfusionToggleButton from './ConfusionToggleButton';
 import AddQuestion from './AddQuestion';
 import QuestionList from './QuestionList';
 
-import {
-  updateConfusion,
-  joinClassRoom,
-  leaveClassRoom
-} from '../../../redux/actions';
+import { updateConfusion, joinClass, leaveClass } from '../../../redux/actions';
 
 const styles = {
   contentContainer: {
@@ -55,8 +52,6 @@ class StudentClassView extends Component {
       questions: new Map(),
       text: ''
     };
-    this.join = this.join(this);
-    this.leave = this.leave(this);
     this.toggleConfusion = this.toggleConfusion.bind(this);
     this.submitQuestion = this.submitQuestion.bind(this);
     this.upvoteQuestion = this.upvoteQuestion.bind(this);
@@ -66,9 +61,7 @@ class StudentClassView extends Component {
   componentDidMount() {
     const { socket, studentId, classId, updateMyConfusion } = this.props;
 
-    socket.emit('joinClass', { studentId, isOrganizer: false, classId });
     socket.emit('classRoom', classId);
-
     socket.on('classRoom', classRoom => {
       const { questions, attendees } = classRoom;
       const confused = attendees[studentId];
@@ -80,15 +73,6 @@ class StudentClassView extends Component {
     socket.on('message', message => {
       console.log(message);
     });
-  }
-
-  join() {
-    const { studentId, joinClass } = this.props;
-    joinClass(studentId);
-  }
-  leave() {
-    const { leaveClass } = this.props;
-    leaveClass();
   }
 
   toggleConfusion() {
@@ -133,9 +117,10 @@ class StudentClassView extends Component {
 
   render() {
     const { questions, confused, text } = this.state;
-    const { courseName, studentId } = this.props;
+    const { courseName, studentId, classId } = this.props;
     return (
       <div className="custom-container">
+        {!studentId || !classId ? <Redirect to="/join" /> : null}
         <Header courseName={courseName} studentId={studentId} />
         <div style={styles.contentContainer}>
           <div style={styles.left}>
@@ -171,24 +156,26 @@ StudentClassView.propTypes = {
   classId: PropTypes.string.isRequired,
   courseName: PropTypes.string.isRequired,
   updateMyConfusion: PropTypes.func.isRequired,
-  joinClass: PropTypes.func,
-  leaveClass: PropTypes.func
+  joinClassRoom: PropTypes.func,
+  leaveClassRoom: PropTypes.func
 };
 
 const mapStateToProps = state => {
+  const { student } = state;
   return {
-    studentId: state && state.student && state.student.studentId,
-    confusionState: state && state.student && state.student.confusionState,
-    classId: state && state.classRoom && state.classRoom.classId,
-    courseName: state && state.classRoom && state.classRoom.courseName
+    studentId: student && student.studentId,
+    confusionState: student && student.confusionState,
+    classId: student && student.currentClass && student.currentClass.classId,
+    courseName:
+      student && student.currentClass && student.currentClass.courseName
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     updateMyConfusion: confusion => dispatch(updateConfusion(confusion)),
-    joinClass: studentId => dispatch(joinClassRoom(studentId)),
-    leaveClass: () => dispatch(leaveClassRoom())
+    joinClassRoom: studentId => dispatch(joinClass(studentId)),
+    leaveClassRoom: () => dispatch(leaveClass())
   };
 };
 
