@@ -124,14 +124,12 @@ class ManageCourseDetail extends Component {
   }
 
   startClass(roomCode) {
-    // courseId, courseName
     const { courseId, token, loadClassRoom } = this.props;
-    const { courseName } = this.state;
     const bearer = `Bearer ${token}`;
     const body = JSON.stringify({
       roomCode,
       courseId,
-      courseName
+      courseName: this.state.courseName
     });
     console.log('start class');
 
