@@ -4,6 +4,7 @@
 Confusion Tracker Application keeps track of students’ comprehension in class and provides such information to the instructors via confusion level graph in real-time.
 
 ## Heroku link
+(NOT UPDATED)
 https://confusion-tracker.herokuapp.com/
 
 ## Travis Status
