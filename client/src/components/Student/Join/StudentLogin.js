@@ -167,9 +167,8 @@ class StudentLogin extends Component {
   joinClassRoom() {
     const { studentId, classId, courseName } = this.state;
     console.log('submit form', studentId, classId);
-    const { socket, join } = this.props;
+    const { join } = this.props;
     join({ studentId, classId, courseName });
-    // socket.emit('joinClass', { studentId, isOrganizer: false, classId });
     this.props.history.push(`/student/class/${courseName}`);
   }
 
