@@ -100,7 +100,6 @@ io.on('connection', async socket => {
         throw new Error('missing ids');
       }
       const classRoom = await Class.findById(classId);
-      // const classRoom = await Class.findOne({ classId });
       if (!classRoom) {
         throw new Error('class room not found');
       }
@@ -118,7 +117,6 @@ io.on('connection', async socket => {
         throw new Error('missing ids');
       }
       const classRoom = await Class.findById(classId);
-      // const classRoom = await Class.findOne({ classId });
       if (!classRoom || !classRoom.attendees.has(studentId)) {
         throw new Error('class room or student not found');
       }
@@ -131,7 +129,6 @@ io.on('connection', async socket => {
       classRoom.attendees.set(studentId, !confusion);
 
       const updatedRoom = await classRoom.save();
-      // console.log('updated ', updatedRoom);
       socket.emit('classRoom', updatedRoom);
     } catch (err) {
       console.log(err);
@@ -142,19 +139,15 @@ io.on('connection', async socket => {
   // add question
   socket.on('addQuestion', async ({ classId, studentId, text, timestamp }) => {
     try {
-      console.log('adding question');
       if (!classId || !studentId || !text) {
         throw new Error('missing inputs');
       }
       const classRoom = await Class.findById(classId);
-      // const classRoom = await Class.findOne({ classId });
       if (!classRoom) {
         throw new Error('class room not found');
       }
 
       const questionId = mongoose.Types.ObjectId().toString();
-      const upvoter = new Map();
-      upvoter.set(studentId, false);
       const question = {
         questionId,
         askedBy: studentId,
@@ -165,7 +158,6 @@ io.on('connection', async socket => {
       classRoom.questions.set(questionId, question);
 
       const updatedRoom = await classRoom.save();
-      // console.log('updated ', updatedRoom);
       io.in(classId).emit('classRoom', updatedRoom);
     } catch (err) {
       console.log(err);
@@ -178,34 +170,29 @@ io.on('connection', async socket => {
     'toggleUpvoteQuestion',
     async ({ classId, studentId, questionId }) => {
       try {
-        console.log('toggling upvote');
         if (!classId || !studentId || !questionId) {
           throw new Error('missing ids');
         }
         const classRoom = await Class.findById(classId);
-        // const classRoom = await Class.findOne({ classId });
         if (!classRoom || !classRoom.questions.has(questionId)) {
           throw new Error('class room or question not found');
         }
 
-        const question = classRoom.questions.get(questionId);
-        const upvoters = question.upvoters.slice();
-        const upvoted = upvoters.indexOf(studentId);
+        const question = Object.assign({}, classRoom.questions.get(questionId));
+        const upvotersArr = question.upvoters.slice();
+        const upvoted = upvotersArr.indexOf(studentId);
         if (upvoted !== -1) {
           // already voted; undo upvote
-          console.log('undo');
-          upvoters.splice(upvoted, 1);
+          upvotersArr.splice(upvoted, 1);
         } else {
           // not voted; upvote
-          console.log('yes upvote');
-          upvoters.push(studentId);
+          upvotersArr.push(studentId);
         }
 
-        question.upvoters = upvoters;
+        question.upvoters = upvotersArr;
         classRoom.questions.set(questionId, question);
 
         const updatedRoom = await classRoom.save();
-        // console.log('updated ', updatedRoom);
         io.in(classId).emit('classRoom', updatedRoom);
       } catch (err) {
         console.log(err);
@@ -213,6 +200,4 @@ io.on('connection', async socket => {
       }
     }
   );
-
-  // end class
 });

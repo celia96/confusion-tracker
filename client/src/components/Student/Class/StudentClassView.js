@@ -60,7 +60,7 @@ class StudentClassView extends Component {
 
   componentDidMount() {
     const { socket, studentId, classId, updateMyConfusion } = this.props;
-
+    socket.emit('joinClass', { studentId, isOrganizer: false, classId });
     socket.emit('classRoom', classId);
     socket.on('classRoom', classRoom => {
       const { questions, attendees } = classRoom;

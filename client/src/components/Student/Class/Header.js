@@ -36,7 +36,9 @@ const Header = ({ courseName, studentId }) => {
   return (
     <div style={styles.container}>
       <img src={image} style={styles.logo} alt="logo" />
-      <span style={styles.name}>{`Class ${courseName} - ${studentId}`}</span>
+      <span
+        style={styles.name}
+      >{`Welcome to ${courseName}, ${studentId}`}</span>
       <Button style={styles.leaveButton}>Leave</Button>
     </div>
   );

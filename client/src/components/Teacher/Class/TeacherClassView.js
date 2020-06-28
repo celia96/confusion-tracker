@@ -23,10 +23,12 @@ class TeacherClassView extends Component {
     super(props);
     this.state = {
       collapseMenu: false,
-      collapseQuestions: false
+      collapseQuestions: false,
+      pausedClass: false
     };
     this.toggleMenu = this.toggleMenu.bind(this);
     this.toggleQuestions = this.toggleQuestions.bind(this);
+    this.pause = this.pause.bind(this);
     this.end = this.end.bind(this);
   }
 
@@ -60,6 +62,13 @@ class TeacherClassView extends Component {
     });
   }
 
+  pause() {
+    console.log('pause class');
+    this.setState({
+      pausedClass: !this.state.pausedClass
+    });
+  }
+
   end() {
     console.log('stop class');
     /* const { socket, classId, chartData, stopClass } = this.props;
@@ -69,7 +78,12 @@ class TeacherClassView extends Component {
 
   render() {
     const { socket } = this.props;
-    const { questions, collapseMenu, collapseQuestions } = this.state;
+    const {
+      questions,
+      collapseMenu,
+      collapseQuestions,
+      pausedClass
+    } = this.state;
     return (
       <div style={styles.container}>
         <Menu
@@ -77,7 +91,11 @@ class TeacherClassView extends Component {
           toggle={this.toggleMenu}
           endClass={this.end}
         />
-        <ConfusionGraph socket={socket} />
+        <ConfusionGraph
+          socket={socket}
+          pauseClass={this.pause}
+          paused={pausedClass}
+        />
         <QuestionList
           questions={questions}
           collapse={collapseQuestions}

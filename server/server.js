@@ -445,7 +445,7 @@ app.get('/api/class/roomCode/:roomCode', async (request, response) => {
   }
   try {
     const classRoom = await Class.findOne({ roomCode });
-    const canAccess = classRoom && classRoom.isOver;
+    const canAccess = classRoom && !classRoom.isOver;
     const courseName = classRoom && classRoom.courseName;
     const classId = classRoom && classRoom._id;
     const payload = {
@@ -471,7 +471,6 @@ app.get('/api/class/:classId', async (request, response) => {
   if (!classId) {
     return response.sendStatus(400);
   }
-  console.log('classid ', classId);
   try {
     const classRoom = await Class.findById(classId);
     console.log('classRoom ', classRoom);

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Chart from 'react-apexcharts';
+import { Button } from 'reactstrap';
 import moment from 'moment';
 
 import { updateClass } from '../../../redux/actions';
@@ -20,6 +21,24 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  infoContainer: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  resumeButton: {
+    backgroundColor: '#6495ed',
+    borderColor: '#6495ed',
+    fontWeight: '600'
+  },
+  pauseButton: {
+    backgroundColor: '#F5b700',
+    borderColor: '#F5b700',
+    fontWeight: '600',
+    color: '#614908'
+  },
+  confusionFont: {
+    fontWeight: 700
   }
 };
 
@@ -28,6 +47,7 @@ class ConfusionGraph extends Component {
     super(props);
 
     this.state = {
+      paused: false,
       confusionRate: 0,
       options: {
         chart: {
@@ -58,13 +78,16 @@ class ConfusionGraph extends Component {
             formatter: function(time) {
               return moment(time).format('h:mmA');
             }
-          }
+          },
+          tickAmount: 10,
+          range: 60000 // currently set to 1 minute
         },
         yaxis: {
           min: 0,
           max: this.props.students.length,
-          tickAmount: this.props.students.length < 10 ? null : 10,
-          forceNiceScale: this.props.students.length < 10 ? true : false,
+          tickAmount:
+            this.props.students.length < 10 ? this.props.students.length : 10,
+          // forceNiceScale: this.props.students.length < 10 ? true : false,
           labels: {
             formatter: function(val) {
               return val.toFixed(0);
@@ -75,22 +98,43 @@ class ConfusionGraph extends Component {
       series: [
         {
           name: 'confusion',
-          data: this.props.chartData || []
+          data: []
         }
       ]
     };
     this.fetchConfusion = this.fetchConfusion.bind(this);
+    this.pauseClass = this.pauseClass.bind(this);
+    this.resumeClass = this.resumeClass.bind(this);
   }
 
   componentDidMount() {
+    // const { dateCreated, paused } = this.props;
     this.fetchConfusion();
     this.interval = setInterval(() => {
       this.fetchConfusion();
-    }, 5000);
+    }, 33000);
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+  }
+
+  pauseClass() {
+    console.log('pause a class');
+    this.setState({
+      paused: true
+    });
+    clearInterval(this.interval);
+  }
+
+  resumeClass() {
+    console.log('resume a class');
+    this.setState({
+      paused: false
+    });
+    this.interval = setInterval(() => {
+      this.fetchConfusion();
+    }, 3000);
   }
 
   fetchConfusion() {
@@ -102,11 +146,12 @@ class ConfusionGraph extends Component {
         return response.json();
       })
       .then(classRoom => {
-        const { confusionRate, attendees } = classRoom;
-
+        const { confusionRate, attendees } = classRoom; //
+        console.log('fetch ', confusionRate);
         const chartData = series.slice()[0].data.slice();
         const data = [new Date().getTime(), confusionRate];
         chartData.push(data);
+        console.log('chart ', chartData);
 
         this.setState({
           options: {
@@ -135,10 +180,22 @@ class ConfusionGraph extends Component {
   }
 
   render() {
-    const { confusionRate, options, series } = this.state;
+    const { paused, confusionRate, options, series } = this.state;
     return (
       <div style={styles.container}>
-        <div>Confusion: {confusionRate}</div>
+        <div style={styles.infoContainer}>
+          <div style={styles.confusionFont}>Confusion: {confusionRate}</div>
+          <span style={{ margin: '10px' }} />
+          {paused ? (
+            <Button style={styles.resumeButton} onClick={this.resumeClass}>
+              Resume
+            </Button>
+          ) : (
+            <Button style={styles.pauseButton} onClick={this.pauseClass}>
+              Pause
+            </Button>
+          )}
+        </div>
         <div id="chart" style={styles.chartContainer}>
           <Chart options={options} series={series} type="line" width="1000" />
         </div>
@@ -158,6 +215,7 @@ const mapStateToProps = state => {
   return {
     classId: state && state.classRoom && state.classRoom.classId,
     students: state && state.classRoom && state.classRoom.students,
+    dateCreated: state && state.classRoom && state.classRoom.dateCreated,
     chartData: state && state.classRoom && state.classRoom.chartData
   };
 };

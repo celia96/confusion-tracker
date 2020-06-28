@@ -79,10 +79,12 @@ const Question = ({ question, upvoteQuestion }) => {
 
 const QuestionList = ({ questions, upvoteQuestion }) => {
   const questionList = Object.values(questions);
-  // console.log('question list ', questionList);
+  const sortedQuestions = questionList.sort(
+    (q1, q2) => q2.upvoters.length - q1.upvoters.length
+  );
   return (
     <div>
-      {questionList.map(question => (
+      {sortedQuestions.map(question => (
         <Question
           key={question.title + question.questionId}
           question={question}

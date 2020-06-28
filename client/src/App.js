@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 
 import NoMatch from './components/NoMatch';
 
+import Home from './components/Home';
+
 // In Class
 import StudentClassView from './components/Student/Class/StudentClassView';
 import TeacherClassView from './components/Teacher/Class/TeacherClassView';
@@ -33,6 +35,11 @@ import './mysass.scss';
 const io = require('socket.io-client');
 
 const routes = [
+  {
+    exact: true,
+    path: '/',
+    component: Home
+  },
   {
     path: '/join',
     component: StudentLogin
@@ -85,12 +92,16 @@ const routes = [
 ];
 
 const PrivateRoute = ({ component: Comp, ...rest }) => {
-  const { isAuthenticated } = rest;
+  const { isAuthenticated, socket } = rest;
   return (
     <Route
       {...rest}
       render={props => {
-        return isAuthenticated ? <Comp {...props} /> : <Redirect to="/login" />;
+        return isAuthenticated ? (
+          <Comp socket={socket} {...props} />
+        ) : (
+          <Redirect to="/login" />
+        );
       }}
     />
   );
@@ -108,6 +119,7 @@ const Routes = ({ socket, isAuthenticated }) => (
               exact={exact}
               path={path}
               isAuthenticated={isAuthenticated}
+              socket={socket}
               component={Comp}
             />
           );

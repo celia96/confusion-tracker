@@ -44,8 +44,7 @@ const styles = {
       fontSize: '0.7rem'
     },
     badge: {
-      backgroundColor: '#6495ed',
-      cursor: 'pointer'
+      backgroundColor: '#6495ed'
     },
     questionText: {
       paddingTop: '10px'
@@ -82,10 +81,6 @@ const VerticalButton = ({ toggle }) => (
       borderColor: '#6495ed'
     }}
   >
-    {/* <div style={{ display: "flex", flexDirection: "column" }}>
-      {"QUESTIONS".split("").map(str => <span>{str}</span>)}
-      
-    </div> */}
     <img src={questionIcon} style={{ maxWidth: '20px' }} alt="question icon" />
   </Button>
 );
@@ -118,6 +113,9 @@ const Question = ({ question }) => {
 
 const QuestionList = ({ collapse, questions, toggle }) => {
   const questionList = Object.values(questions);
+  const sortedQuestions = questionList.sort(
+    (q1, q2) => q2.upvoters.length - q1.upvoters.length
+  );
   const { questionListStyle } = styles;
   const containerStyle = collapse
     ? { ...questionListStyle.container, width: '40%' }
@@ -128,7 +126,7 @@ const QuestionList = ({ collapse, questions, toggle }) => {
       <VerticalButton style={{ marginBottom: '1rem' }} toggle={toggle} />
       {collapse ? (
         <div style={questionListStyle.listContainer}>
-          {questionList.map(question => (
+          {sortedQuestions.map(question => (
             <Question
               key={question.title + question.questionId}
               question={question}

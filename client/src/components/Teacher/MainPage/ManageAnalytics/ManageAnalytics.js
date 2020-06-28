@@ -80,7 +80,8 @@ const ConfusionChart = ({ students, chartData }) => {
         formatter: function(time) {
           return moment(time).format('h:mmA');
         }
-      }
+      },
+      tickAmount: 'dataPoints'
     },
     yaxis: {
       min: 0,

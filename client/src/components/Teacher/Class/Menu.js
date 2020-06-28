@@ -24,9 +24,11 @@ const styles = {
     backgroundColor: '#6495ed'
   },
   endClassButton: {
+    width: '100%',
     backgroundColor: '#F5b700',
     borderColor: '#F5b700',
-    width: '100%'
+    fontWeight: '600',
+    color: '#614908'
   }
 };
 
@@ -49,10 +51,10 @@ const VerticalButton = ({ toggle }) => (
 const Menu = ({ classInfo, teacherInfo, collapse, toggle, endClass }) => {
   const { questions, confusionRate, students, courseName } = classInfo;
   const { firstName, lastName } = teacherInfo;
-  const studentsNum = Object.keys(students).length;
-  const questionsNum = Object.keys(questions).length;
+  const studentsNum = Object.keys(students).length || 0;
+  const questionsNum = Object.keys(questions).length || 0;
   const percentage = `${Math.floor(
-    (confusionRate * 100) / studentsNum
+    (confusionRate * 100) / studentsNum || 0
   ).toString()} %`;
   const containerStyle = collapse
     ? { ...styles.container, width: '40%' }
