@@ -35,6 +35,9 @@ const Home = () => (
       <Link to="/login" style={styles.link}>
         <Button style={styles.button}>Teacher Login</Button>
       </Link>
+      <Link to="/register" style={styles.link}>
+        <Button style={styles.button}>Teacher Register</Button>
+      </Link>
     </div>
   </Container>
 );

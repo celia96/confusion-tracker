@@ -112,7 +112,7 @@ class ConfusionGraph extends Component {
     this.fetchConfusion();
     this.interval = setInterval(() => {
       this.fetchConfusion();
-    }, 33000);
+    }, 3000);
   }
 
   componentWillUnmount() {
