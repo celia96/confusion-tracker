@@ -89,8 +89,8 @@ class ConfusionGraph extends Component {
             this.props.students.length < 10 ? this.props.students.length : 10,
           // forceNiceScale: this.props.students.length < 10 ? true : false,
           labels: {
-            formatter: function(val) {
-              return val.toFixed(0);
+            formatter: function(val, index) {
+              return index;
             }
           }
         }
@@ -112,7 +112,7 @@ class ConfusionGraph extends Component {
     this.fetchConfusion();
     this.interval = setInterval(() => {
       this.fetchConfusion();
-    }, 3000);
+    }, 2000);
   }
 
   componentWillUnmount() {
@@ -134,7 +134,7 @@ class ConfusionGraph extends Component {
     });
     this.interval = setInterval(() => {
       this.fetchConfusion();
-    }, 3000);
+    }, 2000);
   }
 
   fetchConfusion() {
@@ -158,7 +158,16 @@ class ConfusionGraph extends Component {
             ...options,
             yaxis: {
               ...options.yaxis,
-              max: Object.keys(attendees).length
+              max: Object.keys(attendees).length,
+              tickAmount:
+                Object.keys(attendees).length < 10
+                  ? Object.keys(attendees).length
+                  : 10,
+              labels: {
+                formatter: function(val, index) {
+                  return index;
+                }
+              }
             }
           },
           series: [
