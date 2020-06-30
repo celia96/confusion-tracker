@@ -29,14 +29,11 @@ const Home = () => (
     <img src={logo} style={styles.logo} alt="logo" />
     <div>
       <Link to="/join" style={styles.link}>
-        <Button style={styles.button}>Student Login</Button>
+        <Button style={styles.button}>Student</Button>
       </Link>
       <span style={{ margin: '5px' }} />
       <Link to="/login" style={styles.link}>
-        <Button style={styles.button}>Teacher Login</Button>
-      </Link>
-      <Link to="/register" style={styles.link}>
-        <Button style={styles.button}>Teacher Register</Button>
+        <Button style={styles.button}>Teacher</Button>
       </Link>
     </div>
   </Container>
